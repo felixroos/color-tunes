@@ -1,0 +1,10 @@
+.song > ul.info {
+  display: flex;
+  list-style: none;
+  padding: 0;
+}
+
+.song > ul.info > li {
+  padding-right: 10px;
+  box-sizing: border-box;
+}

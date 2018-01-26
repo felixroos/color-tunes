@@ -1,6 +1,7 @@
 # color-tunes
 Chord Progressions of common Jazz Standards... in color!
 
+[DEMO](felixroos.github.io/color-tunes)
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 

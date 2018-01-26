@@ -1,13 +1,15 @@
 import React from 'react';
 /* import { sounds } from './assets/sounds/sounds.js'; */
+import { transpose } from 'tonal';
 import * as Chord from 'tonal-chord';
 import * as Note from 'tonal-note';
-import * as Scale from 'tonal-scale';
 import * as PcSet from 'tonal-pcset';
-import chordTranslator from 'chord-translator';
 import PianoKeyboard from './components/PianoKeyboard';
+import Score from './components/Score';
 import { getTonalChord } from './chordScales';
 
+const center = pc =>
+  pc ? (pc[0] === "A" || pc[0] === "B" ? pc + 3 : pc + 4) : null;
 
 export default class Player extends React.Component {
   constructor() {
@@ -21,7 +23,7 @@ export default class Player extends React.Component {
   playChord(chord) {
     const notes = Chord.notes(getTonalChord(chord));
     notes.forEach(note => {
-      const index = Note.chroma(note) + 36;
+      /* const index = Note.chroma(note) + 36; */
       /* var audio = new Audio(sounds[index - 16]); */
       /* audio.play(); */
       console.warn('Audio is currently not available');
@@ -50,11 +52,14 @@ export default class Player extends React.Component {
   }
 
   render() {
-    let piano = '';
+    let piano, score = '';
     const chord = this.props.chord || this.state.chord;
     if (chord) {
       const notes = Chord.notes(getTonalChord(chord));
+      const intervals = Chord.intervals(getTonalChord(chord));
       const tokens = Chord.tokenize(getTonalChord(chord));
+      const tonic = Note.pc(tokens[0]);
+      const scorenotes = intervals.map(transpose(center(tonic)));
 
       const chroma = PcSet.chroma(notes);
       piano = (<PianoKeyboard
@@ -65,11 +70,14 @@ export default class Player extends React.Component {
         maxOct={7}
         notes={notes}
       />);
+      // keyTonic={tokens[0]}  
+      score = <Score notes={scorenotes} />
     }
 
     return (
       <div className="player">
         {piano}
+        {score}
         <ul>
           <li>
             <a onClick={() => this.playTune()}>

@@ -20,7 +20,7 @@ export default class Songs extends React.Component {
   render() {
     const songs = standards.map((song, index) => (
       <li key={index}>
-        <a onClick={() => this.select(song)} href="#">
+        <a onClick={() => this.select(song)}>
           {song.title}
         </a>
       </li>

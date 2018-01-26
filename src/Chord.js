@@ -11,7 +11,7 @@ export default class Chord extends React.Component {
         backgroundColor: `#${color}`,
         opacity: 0.2,
       };
-      return <div className="color-bar" style={style} key={index} />;
+      return (<div className="color-bar" style={style} key={index} />);
     });
     return (
       <div

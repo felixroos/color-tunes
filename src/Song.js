@@ -7,14 +7,17 @@ export default class Song extends React.Component {
     super(props);
     this.state = {};
   }
+  selectChord(chord) {
+    this.setState({ chord });
+  }
   render() {
     const song = this.props.data;
     return (
       <div className="song">
         <h1>{song.title}</h1>
         <SongInfo song={song} />
-        <Sheet measures={song.music.measures} />
-        <Player measures={song.music.measures} />
+        <Sheet measures={song.music.measures} onClickChord={(chord) => this.selectChord(chord)} />
+        <Player measures={song.music.measures} chord={this.state.chord} />
       </div>
     );
   }

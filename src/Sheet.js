@@ -1,7 +1,7 @@
 import React from 'react';
 import './sheet.css';
 import Chord from './Chord';
-import { playChord, matchChordScales } from './Player';
+import { matchChordScales } from './chordScales';
 
 class Measure extends React.Component {
   render() {
@@ -9,7 +9,7 @@ class Measure extends React.Component {
       <Chord
         chord={chord}
         key={index}
-        onClick={chord => playChord(chord)}
+        onClick={() => this.props.onClickChord(chord)}
         harmony={this.props.harmony[index]}
       />
     ));
@@ -35,7 +35,7 @@ export default class Sheet extends React.Component {
         } else {
           brothers.unshift(
             measures[measures.length - 1][
-              measures[measures.length - 1].length - 1
+            measures[measures.length - 1].length - 1
             ]
           );
         }
@@ -51,7 +51,7 @@ export default class Sheet extends React.Component {
       });
     });
     const bars = measures.map((measure, index) => {
-      return <Measure measure={measure} harmony={harmony[index]} key={index} />;
+      return <Measure measure={measure} harmony={harmony[index]} key={index} onClickChord={(chord) => this.props.onClickChord(chord)} />;
     });
     return <div className="sheet">{bars}</div>;
   }

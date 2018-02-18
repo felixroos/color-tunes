@@ -1,0 +1,24 @@
+li {
+    list-style: none;
+    display: inline-block;
+    min-width: 80px;
+    padding: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+li:hover {
+    background: #d7ffc1;
+}
+
+li.active {
+    background: #58ad3e;
+}
+
+li.sub {
+    background: #d7ffc1;
+}
+
+li.super {
+    background: #ccc;
+}

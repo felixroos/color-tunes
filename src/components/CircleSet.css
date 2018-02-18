@@ -1,0 +1,35 @@
+.Circle .background {
+    fill: #fff;
+}
+
+.Circle text {
+    cursor: pointer;
+}
+
+.NOCircle .background {
+    fill: #fff;
+}
+
+.Circle .tonic {
+    fill: #58ad3e;
+}
+
+.Circle polygon {
+    transition: all .2s linear;
+}
+
+.Circle polygon.shape {
+    fill: #d7ffc1;
+    stroke: #58ad3e;
+    opacity: 0.5;
+}
+
+.Circle polygon.blue {
+    fill: #65c3de;
+    stroke: #4a8ea2;
+}
+
+.Circle polygon.background {
+    fill: #f0f0f0;
+    stroke: #c0c0c0;
+}

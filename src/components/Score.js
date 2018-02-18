@@ -54,7 +54,7 @@ class Score extends PureComponent {
     }
 
     render() {
-        return (<div id="mySVGDiv" ref="container" width={W} height={H} ></div>);
+        return (<div ref="container" width={W} height={H} ></div>);
     }
 }
 Score.propTypes = {

@@ -7,13 +7,18 @@ export function getTonalChord(chord) {
     return chord
         .replace('-', 'm')
         .replace('^', 'maj')
-        .replace('d', 'dim')
+        /* .replace('d', 'dim') */
         .replace('h7', 'm7b5');
 }
 
 export const chordScales = name => {
     const isSuperset = PcSet.isSupersetOf(Chord.intervals(name));
     return Scale.names().filter(name => isSuperset(Scale.intervals(name)));
+};
+
+export const scaleChords = name => {
+    const isSubset = PcSet.isSubsetOf(Scale.intervals(name));
+    return Chord.names().filter(name => isSubset(Chord.intervals(name)));
 };
 
 export function getChromas(root, scales) {

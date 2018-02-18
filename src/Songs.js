@@ -1,6 +1,7 @@
 import React from 'react';
 import standards from './assets/standards.json';
 import Song from './Song';
+import Explorer from './Explorer';
 
 export default class Songs extends React.Component {
   constructor() {
@@ -27,11 +28,12 @@ export default class Songs extends React.Component {
     ));
     return (
       <div>
-        <button onClick={() => this.setState({ song: this.randomSong() })}>
+        <Explorer />
+        {/* <button onClick={() => this.setState({ song: this.randomSong() })}>
           Zufall
         </button>
         <Song data={this.state.song} />
-        <ul>{songs}</ul>
+        <ul>{songs}</ul> */}
       </div>
     );
   }

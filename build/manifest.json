@@ -1,6 +1,6 @@
 {
-  "short_name": "Color Harmony",
-  "name": "Master Chords and Scales",
+  "short_name": "React App",
+  "name": "Create React App Sample",
   "icons": [
     {
       "src": "favicon.ico",

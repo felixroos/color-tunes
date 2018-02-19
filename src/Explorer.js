@@ -108,10 +108,10 @@ export default class Explorer extends React.Component {
                 return 'sub';
             }
         }
-        const tonics = chromatics
+        /* const tonics = chromatics
             .map((tonic, index) =>
                 (<li key={index} className={noteClass(tonic, this.state, notes)} onClick={() => this.setState({ tonic })}>{tonic}</li>)
-            )
+            ) */
         function chordClass(chord, current) {
             if (current === chord) {
                 return 'active';
@@ -197,10 +197,6 @@ export default class Explorer extends React.Component {
                 {piano}
                 {score}
                 {circle}
-                <h2>Roots</h2>
-                <ul>
-                    {tonics}
-                </ul>
                 <h2>Chords</h2>
                 {chordGroups}
                 <h2>Scales</h2>

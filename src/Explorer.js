@@ -193,7 +193,6 @@ export default class Explorer extends React.Component {
 
         return (
             <div className="explorer">
-
                 {label}
                 {piano}
                 {score}

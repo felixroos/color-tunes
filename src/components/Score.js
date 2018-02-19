@@ -7,6 +7,7 @@ const W = 512;
 const H = 120;
 
 class Score extends PureComponent {
+    svg = false;
     componentDidMount() {
         this.updateCanvas();
     }
@@ -22,9 +23,13 @@ class Score extends PureComponent {
         try {
             const Vex = window.Vex;
             const { Renderer, Formatter } = Vex.Flow;
-            /* const renderer = new Renderer(this.refs.canvas, Renderer.Backends.CANVAS); */
-            this.refs.container.innerHTML = '';
-            const renderer = new Renderer(this.refs.container, Renderer.Backends.SVG);
+            let renderer;
+            if (this.svg) {
+                this.refs.container.innerHTML = '';
+                renderer = new Renderer(this.refs.container, Renderer.Backends.SVG);
+            } else {
+                renderer = new Renderer(this.refs.container, Renderer.Backends.CANVAS);
+            }
             const ctx = renderer.getContext();
             renderer.resize(W, H);
             ctx.clearRect(0, 0, W, H);
@@ -54,7 +59,13 @@ class Score extends PureComponent {
     }
 
     render() {
-        return (<div ref="container" width={W} height={H} ></div>);
+        if (this.svg) {
+            return (<div class="score" ref="container" width={W} height={H}></div>);
+        }
+        return (
+            <div class="score" >
+                <canvas ref="container" width={W} height={H}></canvas>
+            </div>);
     }
 }
 Score.propTypes = {

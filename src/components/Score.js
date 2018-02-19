@@ -60,10 +60,10 @@ class Score extends PureComponent {
 
     render() {
         if (this.svg) {
-            return (<div class="score" ref="container" width={W} height={H}></div>);
+            return (<div className="score" ref="container" width={W} height={H}></div>);
         }
         return (
-            <div class="score" >
+            <div className="score" >
                 <canvas ref="container" width={W} height={H}></canvas>
             </div>);
     }

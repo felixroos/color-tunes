@@ -24,6 +24,10 @@
     opacity: 0.5;
 }
 
+.Circle text {
+    fill: #3a3a3a
+}
+
 .Circle polygon.blue {
     fill: #65c3de;
     stroke: #4a8ea2;

@@ -59,7 +59,7 @@ export default ({ size = 300, offset = 0, chroma = '0', type = 'set', tonic = 'C
             const color = stepColor(i, flip);
             return (
                 <text x={x} y={y} onClick={() => noteInfo(note)} onClick={(e) => handleClick(e, note)}
-                    fontFamily="Verdana" fontSize={fontsize} key={i} >
+                    fontFamily="Verdana" fontSize={fontsize} key={i} fill={color}>
                     {note}
                 </text>) //<!-- fill={color} -->
         });

@@ -8,7 +8,7 @@ export default class CircleSet extends React.Component {
     /* constructor({ size = 300, offset = 0, chroma = '0', type = 'set', tonic = 'C', flip = false, chromatic = false, onClick, notes, focus, interval }) { */
 
     history = [[0, 0, 0, 0, 0, 0]];
-    animations = [];
+    /* animations = []; */
 
     constructor(props) {
         super();
@@ -128,7 +128,7 @@ export default class CircleSet extends React.Component {
         let animation = '';
         if (animated && this.history.length > 1) {
             animation = <animate fill="freeze" key={this.history.length} ref={(animation) => { this.startAnimation(animation) }} attributeName="points" dur="200ms" from={this.history[1].join(' ')} to={this.history[0].join(' ')} />
-            this.animations.push(animation);
+            /* this.animations.push(animation); */
         }
 
         return (
@@ -141,7 +141,8 @@ export default class CircleSet extends React.Component {
                 <polygon className="background" points={positions.join(' ')} />
                 <circle className="tonic" cx={tonicPosition.x} cy={tonicPosition.y} r={3} fill={color} />
                 <polygon className="shape" points={(animated ? this.history[1] : this.history[0]).join(' ')} fill={color}>
-                    {this.animations}
+                    
+                    {animation}
                 </polygon>
                 {line}
                 {this.props.line}

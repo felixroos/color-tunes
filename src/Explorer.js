@@ -268,9 +268,9 @@ export default class Explorer extends React.Component {
         const similarScales = parallels.scales.reduce((scales, scale, index) => {
             return scales.concat(scale.roots.map(root => ({ root, symbol: scale.symbol })));
         }, []).map((scale, index) => <li key={index} className={this.scaleClasses(scale.symbol, parallels, supersets, subsets, this.state.tonic !== scale.root)} onClick={() => this.setState({ scale: scale.symbol, chord: null, tonic: scale.root })}>{scale.root} {scale.symbol}</li>);
-        const similar = similarChords.concat(similarScales).length > 1 ? (
+        const similar = similarChords.concat(similarScales).length > 0 ? (
             <div>
-                <h2>Equal Notes</h2>
+                <h2>Same Notes</h2>
                 <ul>
                     {similarChords}
                     {similarScales}
@@ -284,13 +284,11 @@ export default class Explorer extends React.Component {
                 {piano}
                 {score}
                 {circle}
-
-
+                {similar}
                 <h2>Chords</h2>
                 {chordGroups}
                 <h2>Scales</h2>
                 {scaleGroups}
-                {similar}
 
                 < h4 > Circle of</h4 >
                 <ul>

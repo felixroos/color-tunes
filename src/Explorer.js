@@ -190,7 +190,7 @@ export default class Explorer extends React.Component {
 
         // notes={labels}
         circle = (<CircleSet
-            size="300"
+            size="400"
             chroma={chroma}
             onClick={(note) => this.setState({ tonic: note })}
             tonic={tonic}

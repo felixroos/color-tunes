@@ -165,8 +165,6 @@ export default class Explorer extends React.Component {
             // TODO: bug resport: 4 and 5 chords (possibly more) do not omit the octave after the notes
             notes = this.removeOctaves(Chord.notes(chord));
             const intervals = Chord.intervals(chord);
-            console.log('intervals', intervals);
-
             scorenotes = intervals.map(transpose(center(tonic)));
             chroma = this.chordChroma(this.state.tonic, this.state.chord);
             parallels = this.chromaParallels(chroma);
@@ -175,6 +173,7 @@ export default class Explorer extends React.Component {
             supersets = this.supersets(this.state.chord, false)
         }
 
+        /* console.log('intervals', intervals); */
 
         // TODO: use fitting note labels (sharp/flat)
         /* let labels = Scale.intervals('chromatic')
@@ -285,13 +284,14 @@ export default class Explorer extends React.Component {
                 {piano}
                 {score}
                 {circle}
+
+
+                <h2>Chords</h2>
+                {chordGroups}
+                <h2>Scales</h2>
+                {scaleGroups}
                 {similar}
 
-
-                <h2> Chords</h2 >
-                {chordGroups}
-                < h2 > Scales</h2 >
-                {scaleGroups}
                 < h4 > Circle of</h4 >
                 <ul>
                     {circles}

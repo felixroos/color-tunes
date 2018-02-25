@@ -19,9 +19,10 @@ li {
     transition: all .2s linear;
 }
 
-.flex {
+.explorer {
     display: flex;
     flex-wrap: wrap;
+    height: 100%;
 }
 
 .symbols {
@@ -31,6 +32,8 @@ li {
     margin: 5px;
     flex-grow: 1;
     flex-basis: auto;
+    max-height: 100%;
+    overflow: scroll;
 }
 
 .Circle {

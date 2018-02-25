@@ -287,29 +287,27 @@ export default class Explorer extends React.Component {
         // TODO: preview chord/scale on hover in circle (under current)
         return (
             <div className="explorer" >
-                <div className="flex">
-                    <div className="symbols">
-                        {label}
-                        {piano}
-                        {score}
-                        {circle}
-                    </div>
-                    <div className="symbols">
-                        {similar}
-                        <h2>Chords</h2>
-                        {chordGroups}
-                        <h2>Scales</h2>
-                        {scaleGroups}
-                        <h2>Settings</h2>
-                        <h5>Filter</h5>
-                        <ul>
-                            {groups}
-                        </ul>
-                        <h5>Circle of</h5>
-                        <ul>
-                            {circles}
-                        </ul>
-                    </div>
+                <div className="symbols">
+                    {label}
+                    {piano}
+                    {score}
+                    {circle}
+                </div>
+                <div className="symbols">
+                    {similar}
+                    <h2>Chords</h2>
+                    {chordGroups}
+                    <h2>Scales</h2>
+                    {scaleGroups}
+                    <h2>Settings</h2>
+                    <h5>Filter</h5>
+                    <ul>
+                        {groups}
+                    </ul>
+                    <h5>Circle of</h5>
+                    <ul>
+                        {circles}
+                    </ul>
                 </div>
             </div >
         );

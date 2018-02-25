@@ -8,7 +8,7 @@ import * as Scale from 'tonal-scale';
 import PianoKeyboard from './components/PianoKeyboard';
 import Score from './components/Score';
 import CircleSet from './components/CircleSet';
-import { chords, scales, scaleNames, chordNames, groupNames } from './components/Symbols';
+import { chords, scales, scaleNames, scaleName, chordNames, chordName, groupNames } from './components/Symbols';
 
 /* import * as Interval from 'tonal-interval'; */
 /* import * as Distance from "tonal-distance" */
@@ -157,7 +157,7 @@ export default class Explorer extends React.Component {
             chroma = PcSet.chroma(notes);
             const intervals = Scale.intervals(this.state.scale);
             scorenotes = intervals.map(transpose(center(tonic)));
-            label = <h2>{tonic} {this.state.scale}</h2>;
+            label = <h2>{tonic} {scaleName(this.state.scale)}</h2>;
             parallels = this.chromaParallels(chroma);
             subsets = this.subsets(this.state.scale, true)
             supersets = this.supersets(this.state.scale, true)
@@ -171,7 +171,7 @@ export default class Explorer extends React.Component {
             scorenotes = intervals.map(transpose(center(tonic)));
             chroma = this.chordChroma(this.state.tonic, this.state.chord);
             parallels = this.chromaParallels(chroma);
-            label = <h2>{chord}</h2>;
+            label = <h2>{tonic}{chordName(this.state.chord)}</h2>;
             subsets = this.subsets(this.state.chord, false)
             supersets = this.supersets(this.state.chord, false)
         }
@@ -224,7 +224,7 @@ export default class Explorer extends React.Component {
             return groups;
         }, []).map(group =>
             group.map((chord, index) => (
-                (<li key={index} className={this.chordClasses(chord, parallels, supersets, subsets)} onClick={() => this.setState({ scale: null, chord })}>{chord} </li>)
+                (<li key={index} className={this.chordClasses(chord, parallels, supersets, subsets)} onClick={() => this.setState({ scale: null, chord })}>{chordName(chord)} </li>)
             )))
             .slice(1).map((group, index) => (
                 <div key={index}>
@@ -249,7 +249,7 @@ export default class Explorer extends React.Component {
             return groups;
         }, []).map(group =>
             group.map((scale, index) => (
-                (<li key={index} className={this.scaleClasses(scale, parallels, supersets, subsets)} onClick={() => this.setState({ chord: null, scale })}>{scale} </li>)
+                (<li key={index} className={this.scaleClasses(scale, parallels, supersets, subsets)} onClick={() => this.setState({ chord: null, scale })}>{scaleName(scale)} </li>)
             )))
             .slice(1).map((group, index) => (
                 <div key={index}>

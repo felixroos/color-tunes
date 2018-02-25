@@ -11,7 +11,7 @@ export const chords = [
     {
         symbol: 'M',
         long: 'Dur',
-        short: '',
+        short: '^',
         groups: ['Basic']
     },
     {
@@ -166,6 +166,23 @@ export function groupNames() {
     return Array.from(new Set(scales.concat(chords)
         .map(item => item.groups)
         .reduce((groups, current) => groups.concat(current), ['All'])));
+}
+
+export function symbolName(symbol, pool, long) {
+    const match = pool.find(item => item.symbol === symbol);
+    if (!match) {
+        return symbol;
+    }
+    return symbol;
+    /* return (long ? match.long : match.short) || symbol; */
+}
+
+export function scaleName(symbol, long = false) {
+    return symbolName(symbol, scales, long);
+}
+
+export function chordName(symbol, long = false) {
+    return symbolName(symbol, chords, long);
 }
 
 console.log('group names', groupNames());

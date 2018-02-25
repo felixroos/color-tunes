@@ -206,7 +206,7 @@ export default class Explorer extends React.Component {
             setTonic={Note.chroma(tonic)}
             onClick={(key) => this.pressedPianoKey(key)}
             minOct={1}
-            maxOct={7}
+            maxOct={5}
             notes={notes}
         />);
 
@@ -291,8 +291,8 @@ export default class Explorer extends React.Component {
                     <div className="symbols">
                         {label}
                         {piano}
-                        {circle}
                         {score}
+                        {circle}
                     </div>
                     <div className="symbols">
                         {similar}

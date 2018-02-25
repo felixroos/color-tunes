@@ -4,18 +4,50 @@ body {
 
 ul {
     padding: 0;
-    border-top: 1px solid #ccc;
+    /* border-top: 1px solid #ccc; */
 }
 
 li {
     list-style: none;
     display: inline-block;
-    min-width: 80px;
+    min-width: 60px;
     margin: 2px;
     padding: 5px;
     cursor: pointer;
     white-space: nowrap;
     border-radius: 10%;
+}
+
+.flex {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.symbols {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin: 5px;
+    flex-grow: 1;
+    flex-basis: auto;
+}
+
+.Circle {
+    width: 100%;
+}
+
+.score {
+    width: 100%;
+    text-align: center;
+    position: relative;
+}
+
+h5 {
+    margin: 0;
+}
+
+ul {
+    margin: 5px 0;
 }
 
 li:hover {
@@ -36,16 +68,6 @@ li.super {
 
 li.parallel {
     border: 1px solid #58ad3e;
-}
-
-.score {
-    width: 100%;
-    text-align: center;
-    position: relative;
-}
-
-.Circle {
-    width: 100%;
 }
 
 canvas {

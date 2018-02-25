@@ -8,6 +8,8 @@ import * as Scale from 'tonal-scale';
 import PianoKeyboard from './components/PianoKeyboard';
 import Score from './components/Score';
 import CircleSet from './components/CircleSet';
+import { chords, scales, scaleNames, chordNames, groupNames } from './components/Symbols';
+
 /* import * as Interval from 'tonal-interval'; */
 /* import * as Distance from "tonal-distance" */
 
@@ -26,7 +28,8 @@ export default class Explorer extends React.Component {
             tonic: 'C',
             chord: 'o',
             history: [],
-            extended: true
+            extended: true,
+            group: 'Basic'
         };
     }
 
@@ -65,7 +68,7 @@ export default class Explorer extends React.Component {
 
     chromaParallels(chroma) {
         return {
-            scales: Scale.names().map(type => {
+            scales: scaleNames(this.state.group).map(type => {
                 return {
                     symbol: type,
                     roots: this.chromatics.filter(root => {
@@ -73,7 +76,7 @@ export default class Explorer extends React.Component {
                     })
                 }
             }).filter(p => p.roots.length),
-            chords: Chord.names().map(type => {
+            chords: chordNames(this.state.group).map(type => {
                 return {
                     symbol: type,
                     roots: this.chromatics.filter(root => {
@@ -88,10 +91,10 @@ export default class Explorer extends React.Component {
         const isSuperset = PcSet.isSupersetOf((isScale ? Scale : Chord).intervals(type));
         return {
             scales: isScale ? Scale.supersets(type) :
-                Scale.names().filter(scale =>
+                scaleNames(this.state.group).filter(scale =>
                     isSuperset(Scale.intervals(scale))),
             chords: !isScale ? Chord.supersets(type) :
-                Chord.names().filter(chord =>
+                chordNames(this.state.group).filter(chord =>
                     isSuperset(Chord.intervals(chord))),
         };
     }
@@ -100,10 +103,10 @@ export default class Explorer extends React.Component {
         const isSubset = PcSet.isSubsetOf((isScale ? Scale : Chord).intervals(type));
         return {
             scales: isScale ? Scale.subsets(type) :
-                Scale.names().filter(scale =>
+                scaleNames(this.state.group).filter(scale =>
                     isSubset(Scale.intervals(scale))),
             chords: !isScale ? Chord.subsets(type) :
-                Chord.names().filter(chord =>
+                chordNames(this.state.group).filter(chord =>
                     isSubset(Chord.intervals(chord))),
         };
     }
@@ -207,7 +210,7 @@ export default class Explorer extends React.Component {
             notes={notes}
         />);
 
-        const chords = Chord.names()
+        const chords = chordNames(this.state.group)
             .sort((a, b) => {
                 return Chord.notes(tonic + a).length < Chord.notes(tonic + b).length ? -1 : 1;
             });
@@ -221,17 +224,17 @@ export default class Explorer extends React.Component {
             return groups;
         }, []).map(group =>
             group.map((chord, index) => (
-                (<li key={index} className={this.chordClasses(chord, parallels, supersets, subsets)} onClick={() => this.setState({ scale: null, chord })}>{chord}</li>)
+                (<li key={index} className={this.chordClasses(chord, parallels, supersets, subsets)} onClick={() => this.setState({ scale: null, chord })}>{chord} </li>)
             )))
             .slice(1).map((group, index) => (
                 <div key={index}>
-                    {/* <strong>{index + 1} Notes</strong> */}
+                    {<h5>{index + 1} Notes</h5>}
                     <ul key={index}>
                         {group}
                     </ul>
                 </div>));
 
-        const scales = Scale.names()
+        const scales = scaleNames(this.state.group)
             .sort((a, b) => {
                 return Scale.notes(tonic, a).length < Chord.notes(tonic, b).length ? -1 : 1;
             });
@@ -246,11 +249,11 @@ export default class Explorer extends React.Component {
             return groups;
         }, []).map(group =>
             group.map((scale, index) => (
-                (<li key={index} className={this.scaleClasses(scale, parallels, supersets, subsets)} onClick={() => this.setState({ chord: null, scale })}>{scale}</li>)
+                (<li key={index} className={this.scaleClasses(scale, parallels, supersets, subsets)} onClick={() => this.setState({ chord: null, scale })}>{scale} </li>)
             )))
             .slice(1).map((group, index) => (
                 <div key={index}>
-                    {/* <strong>{index + 1} Notes</strong> */}
+                    {<h5>{index + 1} Notes</h5>}
                     <ul key={index}>
                         {group}
                     </ul>
@@ -261,6 +264,10 @@ export default class Explorer extends React.Component {
             return <li key={index} className={this.state.circle === circle ? 'active' : ''} onClick={() => this.setState({ circle })}>{circle}</li>
         });
 
+        const groups = groupNames().map((group, index) => {
+            return <li key={index} className={this.state.group === group ? 'active' : ''} onClick={() => this.setState({ group })}>{group}</li>
+        })
+
         const similarChords = parallels.chords.reduce((chords, chord, index) => {
             return chords.concat(chord.roots.map(root => ({ root, symbol: chord.symbol })));
         }, []).map((chord, index) => <li key={index} className={this.chordClasses(chord.symbol, parallels, supersets, subsets, this.state.tonic !== chord.root)} onClick={() => this.setState({ scale: null, chord: chord.symbol, tonic: chord.root })}>{chord.root}{chord.symbol}</li>);
@@ -270,7 +277,7 @@ export default class Explorer extends React.Component {
         }, []).map((scale, index) => <li key={index} className={this.scaleClasses(scale.symbol, parallels, supersets, subsets, this.state.tonic !== scale.root)} onClick={() => this.setState({ scale: scale.symbol, chord: null, tonic: scale.root })}>{scale.root} {scale.symbol}</li>);
         const similar = similarChords.concat(similarScales).length > 0 ? (
             <div>
-                <h2>Same Notes</h2>
+                <h2>Relatives</h2>
                 <ul>
                     {similarChords}
                     {similarScales}
@@ -280,20 +287,30 @@ export default class Explorer extends React.Component {
         // TODO: preview chord/scale on hover in circle (under current)
         return (
             <div className="explorer" >
-                {label}
-                {piano}
-                {score}
-                {circle}
-                {similar}
-                <h2>Chords</h2>
-                {chordGroups}
-                <h2>Scales</h2>
-                {scaleGroups}
-
-                < h4 > Circle of</h4 >
-                <ul>
-                    {circles}
-                </ul>
+                <div className="flex">
+                    <div className="symbols">
+                        {label}
+                        {piano}
+                        {circle}
+                        {score}
+                    </div>
+                    <div className="symbols">
+                        {similar}
+                        <h2>Chords</h2>
+                        {chordGroups}
+                        <h2>Scales</h2>
+                        {scaleGroups}
+                        <h2>Settings</h2>
+                        <h5>Filter</h5>
+                        <ul>
+                            {groups}
+                        </ul>
+                        <h5>Circle of</h5>
+                        <ul>
+                            {circles}
+                        </ul>
+                    </div>
+                </div>
             </div >
         );
     }

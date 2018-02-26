@@ -22,15 +22,18 @@ export const chords = [
     },
     {
         symbol: 'M#5', // = Mb6
-        groups: ['Advanced', 'Symmetric']
+        groups: ['Advanced', 'Symmetric'],
+        short: '△#5'
     },
     {
         symbol: 'Msus4',
-        groups: ['Advanced', 'Symmetric']
+        groups: ['Advanced', 'Symmetric'],
+        short: 'sus4'
     },
     {
         symbol: 'Msus2',
-        groups: ['Advanced', 'Symmetric']
+        groups: ['Advanced', 'Symmetric'],
+        short: 'sus2'
     },
     // 5 4 64 m#5 Mb5  7no5  
     {
@@ -85,7 +88,8 @@ export const chords = [
     },
     {
         symbol: 'M7#5',
-        groups: ['Advanced', 'Diatonic']
+        groups: ['Advanced', 'Diatonic'],
+        short:'△7#5'
     },
     {
         symbol: '7sus4',

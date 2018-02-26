@@ -26,11 +26,11 @@ export default class Explorer extends React.Component {
         super();
         this.state = {
             circle: 'fourths',
-            tonic: 'C',
-            scale: 'melodic minor',
+            tonic: 'D',
+            scale: 'dorian',
             history: [],
             extended: true,
-            group: 'Diatonic'
+            group: 'Modes'
         };
     }
 
@@ -244,7 +244,7 @@ export default class Explorer extends React.Component {
 
         // notes={labels}
         circle = (<CircleSet
-            size="400"
+            size="350"
             chroma={chroma}
             onClick={(note) => this.setState({ tonic: note })}
             tonic={tonic}

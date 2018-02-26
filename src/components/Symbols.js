@@ -35,7 +35,7 @@ export const chords = [
     // 5 4 64 m#5 Mb5  7no5  
     {
         symbol: '7',
-        groups: ['Basic', 'Diatonic'],
+        groups: ['Basic', 'Diatonic', 'Modes'],
         long: 'Dominantsept'
     },
     {
@@ -51,7 +51,7 @@ export const chords = [
     },
     {
         symbol: 'm7',
-        groups: ['Basic', 'Diatonic'],
+        groups: ['Basic', 'Diatonic', 'Modes'],
         long: 'Moll 7',
         short: '-7'
     },
@@ -63,7 +63,7 @@ export const chords = [
     },
     {
         symbol: 'm7b5',
-        groups: ['Basic', 'Diatonic'],
+        groups: ['Basic', 'Diatonic', 'Modes'],
         long: 'Halbvermindert',
     },
     {
@@ -73,7 +73,7 @@ export const chords = [
     },
     {
         symbol: 'Maj7',
-        groups: ['Basic', 'Diatonic'],
+        groups: ['Basic', 'Diatonic', 'Modes'],
         long: 'Major 7',
         short: '^7'
     },
@@ -113,39 +113,40 @@ export const scales = [
     },
     {
         symbol: 'minor pentatonic',
-        groups: ['Basic'],
+        groups: ['Basic', 'Pentatonic'],
     },
     {
         symbol: 'minor blues',
         groups: ['Basic'],
     },
+    // gregorian modes
     {
         symbol: 'major',
-        groups: ['Basic', 'Diatonic'],
+        groups: ['Basic', 'Diatonic', 'Modes'],
     },
     {
         symbol: 'dorian',
-        groups: ['Basic', 'Diatonic'],
-    },
-    {
-        symbol: 'lydian',
-        groups: ['Basic', 'Diatonic'],
-    },
-    {
-        symbol: 'aeolian',
-        groups: ['Basic', 'Diatonic'],
-    },
-    {
-        symbol: 'mixolydian',
-        groups: ['Basic', 'Diatonic'],
+        groups: ['Basic', 'Diatonic', 'Modes'],
     },
     {
         symbol: 'phrygian',
-        groups: ['Basic', 'Diatonic'],
+        groups: ['Basic', 'Diatonic', 'Modes'],
+    },
+    {
+        symbol: 'lydian',
+        groups: ['Basic', 'Diatonic', 'Modes'],
+    },
+    {
+        symbol: 'mixolydian',
+        groups: ['Basic', 'Diatonic', 'Modes'],
+    },
+    {
+        symbol: 'aeolian',
+        groups: ['Basic', 'Diatonic', 'Modes'],
     },
     {
         symbol: 'locrian',
-        groups: ['Basic', 'Diatonic'],
+        groups: ['Basic', 'Diatonic', 'Modes'],
     },
     {
         symbol: 'whole tone',
@@ -155,6 +156,7 @@ export const scales = [
         symbol: 'diminished',
         groups: ['Advanced', 'Symmetric']
     },
+    //HTGT ?
     {
         symbol: 'augmented',
         groups: ['Advanced', 'Symmetric']
@@ -165,9 +167,24 @@ export const scales = [
     },
     // harmonic minor modes
     {
-        symbol: 'harmonic minor',
+        symbol: 'harmonic minor', // HM 1
         groups: ['Advanced', 'Diatonic']
     },
+    // HM 2 locrian #6 !
+    {
+        symbol: 'ionian augmented', // HM 3
+        groups: ['Expert', 'Diatonic']
+    },
+    {
+        symbol: 'dorian #4', // HM 4
+        groups: ['Expert', 'Diatonic']
+    },
+    {
+        symbol: 'spanish', // HM 5
+        groups: ['Expert', 'Diatonic']
+    },
+    // HM 6 lydian #9
+    // HM 7 ???
 
     // melodic minor modes
     {
@@ -184,7 +201,7 @@ export const scales = [
     },
     {
         symbol: 'lydian dominant', // MM 4
-        groups: ['Expert', 'Diatonic']
+        groups: ['Expert', 'Diatonic', 'Symmetric']
     },
     {
         symbol: 'melodic minor fifth mode', // MM 5
@@ -198,10 +215,112 @@ export const scales = [
         symbol: 'altered', // MM 7
         groups: ['Advanced', 'Diatonic']
     },
+    //non european
+    {
+        symbol: 'kumoijoshi',
+        groups: ['Exotic', 'Pentatonic']
+    },
+    {
+        symbol: 'iwato',
+        groups: ['Exotic', 'Pentatonic']
+    },
+    {
+        symbol: 'pelog',
+        groups: ['Exotic', 'Pentatonic']
+    },
+    // hyojo?
+    {
+        symbol: 'egyptian',
+        groups: ['Exotic', 'Pentatonic']
+    },
+    {
+        symbol: 'in-sen',
+        groups: ['Exotic', 'Pentatonic']
+    },
+    {
+        symbol: 'scriabin',
+        groups: ['Exotic', 'Pentatonic']
+    },
+    {
+        symbol: 'ritusen',
+        groups: ['Exotic', 'Pentatonic']
+    },
+    {
+        symbol: 'hirajoshi',
+        groups: ['Exotic', 'Pentatonic']
+    },
+    {
+        symbol: 'malkos raga',
+        groups: ['Exotic', 'Pentatonic']
+    },
+    {
+        symbol: 'vietnamese 1',
+        groups: ['Exotic', 'Pentatonic']
+    },
+    /* {
+        symbol: 'vietnamese 2',
+        groups: ['Exotic', 'Pentatonic'] // = minor pentatonic
+    }, */
+    {
+        symbol: 'lydian pentatonic', // = China (Sikora S. 61)
+        groups: ['Pentatonic']
+    },
+    {
+        symbol: 'mixolydian pentatonic',
+        groups: ['Pentatonic']
+    },
+    {
+        symbol: 'ionian pentatonic',
+        groups: ['Pentatonic']
+    },
+    {
+        symbol: 'locrian pentatonic',
+        groups: ['Pentatonic']
+    },
+    {
+        symbol: 'flat six pentatonic',
+        groups: ['Pentatonic']
+    },
+    {
+        symbol: 'minor six pentatonic',
+        groups: ['Pentatonic']
+    },
+    {
+        symbol: 'minor #7M pentatonic',
+        groups: ['Pentatonic']
+    },
+    {
+        symbol: 'lydian #5P pentatonic',
+        groups: ['Pentatonic']
+    },
+    {
+        symbol: 'whole tone pentatonic',
+        groups: ['Pentatonic', 'Symmetric']
+    },
+    {
+        symbol: 'flat three pentatonic',
+        groups: ['Pentatonic']
+    },
+    {
+        symbol: 'super locrian pentatonic',
+        groups: ['Pentatonic']
+    },
+    {
+        symbol: 'major flat two pentatonic',
+        groups: ['Pentatonic']
+    },
+    {
+        symbol: 'lydian dominant pentatonic',
+        groups: ['Pentatonic']
+    },
+    {
+        symbol: 'neopolitan major pentatonic',
+        groups: ['Pentatonic']
+    }
 
-    /*iwato pelog in-sen ritusen egyptian scriabin hirajoshi kumoijoshi malkos raga vietnamese 1 vietnamese 2  ionian pentatonic lydian pentatonic locrian pentatonic flat six pentatonic minor six pentatonic minor #7M pentatonic lydian #5P pentatonic whole tone pentatonic mixolydian pentatonic flat three pentatonic super locrian pentatonic major flat two pentatonic lydian dominant pentatonic neopolitan major pentatonic
-    piongio   mystery #1 prometheus major blues minor hexatonic six tone symmetric prometheus neopolitan
-     persian  spanish  oriental flamenco balinese  dorian #4 todi raga enigmatic lydian #9 neopolitan locrian #2  lydian minor  locrian major  romanian minor harmonic major hungarian major hungarian minor lydian dominant  ionian augmented neopolitan minor neopolitan major lydian diminished leading whole tone augmented heptatonic double harmonic major double harmonic lydian melodic minor fifth mode melodic minor second mode
+    /*            
+    mystery #1 piongio    prometheus major blues minor hexatonic six tone symmetric prometheus neopolitan
+     persian  spanish  oriental flamenco balinese   todi raga enigmatic lydian #9 neopolitan locrian #2  lydian minor  locrian major  romanian minor harmonic major hungarian major hungarian minor lydian dominant   neopolitan minor neopolitan major lydian diminished leading whole tone augmented heptatonic double harmonic major double harmonic lydian melodic minor fifth mode melodic minor second mode
     bebop kafi raga  purvi raga ichikosucho bebop minor minor bebop bebop major bebop locrian bebop dominant spanish heptatonic minor six diminished
     composite blues
     */
@@ -213,8 +332,7 @@ export function groupFilter(group) {
     return (item) => {
         const level = Math.max(item.groups.filter(group => levels.indexOf(group) !== -1)
             .map(group => levels.indexOf(group)));
-
-        const groups = Array.from(new Set(levels.slice(level).concat(item.groups)));
+        const groups = level > 0 ? Array.from(new Set(levels.slice(level).concat(item.groups))) : item.groups;
         return groups.indexOf(group) !== -1;
     };
 }

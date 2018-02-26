@@ -27,10 +27,10 @@ export default class Explorer extends React.Component {
         this.state = {
             circle: 'fourths',
             tonic: 'C',
-            scale: 'major',
+            scale: 'melodic minor',
             history: [],
             extended: true,
-            group: 'Advanced'
+            group: 'Diatonic'
         };
     }
 

@@ -1,5 +1,6 @@
 body {
     margin: 0 !important;
+    background: #eee;
 }
 
 ul {
@@ -16,24 +17,27 @@ li {
     cursor: pointer;
     white-space: nowrap;
     border-radius: 10%;
-    transition: all .2s linear;
+    transition: background .2s linear;
+    box-sizing: border-box;
 }
 
 .explorer {
-    display: flex;
-    flex-wrap: wrap;
-    height: 100%;
+    /* display: flex; */
+    /* flex-wrap: wrap; */
 }
 
 .symbols {
+    display: inline-block;
     padding: 0 10px;
     border: 1px solid #ddd;
     border-radius: 10px;
-    margin: 5px;
+    margin: 0;
+    box-sizing: border-box;
     flex-grow: 1;
     flex-basis: auto;
     max-height: 100%;
-    overflow: scroll;
+    background-color: #fff;
+    width: 50%;
 }
 
 .Circle {

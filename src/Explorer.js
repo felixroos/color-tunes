@@ -26,7 +26,7 @@ export default class Explorer extends React.Component {
         this.state = {
             circle: 'fourths',
             tonic: 'C',
-            chord: 'o',
+            scale: 'major',
             history: [],
             extended: true,
             group: 'Basic'
@@ -66,24 +66,48 @@ export default class Explorer extends React.Component {
         return PcSet.chroma(notes);
     }
 
+    isChromaParent(chroma, child) {
+        return chroma.split('').map((value, index) => {
+            return child[index] === '0' || child[index] === value;
+        }).reduce((match, current) => match && current, true);
+    }
+
+
+    isChromaChild(chroma, parent) {
+        return chroma.split('').map((value, index) => {
+            return value === '0' || parent[index] === value;
+        }).reduce((match, current) => match && current, true);
+    }
+
     chromaParallels(chroma) {
+        /* console.log('p', this.isChromaParent('111', '101'));
+        console.log('f', this.isChromaChild('111', '101'));
+        console.log('c', this.isChromaChild('101', '111'));
+        console.log('f', this.isChromaParent('101', '111')); */
+
         return {
             scales: scaleNames(this.state.group).map(type => {
                 return {
                     symbol: type,
                     roots: this.chromatics.filter(root => {
                         return this.scaleChroma(root, type) === chroma
-                    })
+                    }),
+                    sub: this.chromatics.filter(root => {
+                        return this.isChromaChild(this.scaleChroma(root, type), chroma)
+                    }),
                 }
-            }).filter(p => p.roots.length),
+            }).filter(p => p.roots.length || p.sub.length),
             chords: chordNames(this.state.group).map(type => {
                 return {
                     symbol: type,
                     roots: this.chromatics.filter(root => {
                         return this.chordChroma(root, type) === chroma
-                    })
+                    }),
+                    sub: this.chromatics.filter(root => {
+                        return this.isChromaChild(this.chordChroma(root, type), chroma)
+                    }),
                 }
-            }).filter(p => p.roots.length)
+            }).filter(p => p.roots.length || p.sub.length)
         };
     }
 
@@ -111,42 +135,37 @@ export default class Explorer extends React.Component {
         };
     }
 
-    chordClasses(chord, parallels, supersets, subsets, notactive) {
-        if (this.state.chord === chord && !notactive) {
+    symbolClasses(type, symbol, parallels, supersets, subsets, differentRoot) {
+        if (this.state[type] === symbol && !differentRoot) {
             return 'active';
         }
-        const brothers = parallels.chords.filter(parallel => parallel.symbol === chord);
+        const brothers = parallels[type + 's']
+            .filter(item => item.roots.length)
+            .filter(parallel => parallel.symbol === symbol);
         if (brothers.length) {
-            return 'parallel';
+            return 'parallel'; // TODO: also check classes below and dont stop here
         }
-        if (supersets.chords.indexOf(chord) !== -1) {
+        if (!differentRoot && supersets[type + 's'].indexOf(symbol) !== -1) {
             return 'super';
         }
-        if (subsets.chords.indexOf(chord) !== -1) {
+        if (!differentRoot && subsets[type + 's'].indexOf(symbol) !== -1) {
             return 'sub';
         }
+
     }
 
-    scaleClasses(scale, parallels, supersets, subsets, notactive) {
-        if (this.state.scale === scale && !notactive) {
-            return 'active';
-        }
-        const brothers = parallels.scales.filter(parallel => parallel.symbol === scale);
-        if (brothers.length) {
-            return 'parallel';
-        }
-        if (supersets.scales.indexOf(scale) !== -1) {
-            return 'super';
-        }
-        if (subsets.scales.indexOf(scale) !== -1) {
-            return 'sub';
-        }
+    chordClasses(chord, parallels, supersets, subsets, differentRoot) {
+        return this.symbolClasses('chord', chord, parallels, supersets, subsets, differentRoot);
+    }
+
+    scaleClasses(scale, parallels, supersets, subsets, differentRoot) {
+        return this.symbolClasses('scale', scale, parallels, supersets, subsets, differentRoot);
     }
 
     render() {
         let piano, circle, label, score = '';
         let tonic, chroma, scorenotes, notes = [];
-        let parallels = [], subsets, supersets;
+        let subsets, supersets;
 
         if (!this.state.tonic) {
             return;
@@ -158,9 +177,8 @@ export default class Explorer extends React.Component {
             const intervals = Scale.intervals(this.state.scale);
             scorenotes = intervals.map(transpose(center(tonic)));
             label = <h2>{tonic} {scaleName(this.state.scale)}</h2>;
-            parallels = this.chromaParallels(chroma);
-            subsets = this.subsets(this.state.scale, true)
-            supersets = this.supersets(this.state.scale, true)
+            subsets = this.subsets(this.state.scale, true);
+            supersets = this.supersets(this.state.scale, true);
 
         }
         if (this.state.chord) {
@@ -170,11 +188,11 @@ export default class Explorer extends React.Component {
             const intervals = Chord.intervals(chord);
             scorenotes = intervals.map(transpose(center(tonic)));
             chroma = this.chordChroma(this.state.tonic, this.state.chord);
-            parallels = this.chromaParallels(chroma);
             label = <h2>{tonic}{chordName(this.state.chord)}</h2>;
-            subsets = this.subsets(this.state.chord, false)
-            supersets = this.supersets(this.state.chord, false)
+            subsets = this.subsets(this.state.chord, false);
+            supersets = this.supersets(this.state.chord, false);
         }
+        const parallels = this.chromaParallels(chroma);
 
         /* console.log('intervals', intervals); */
 
@@ -266,7 +284,7 @@ export default class Explorer extends React.Component {
 
         const groups = groupNames().map((group, index) => {
             return <li key={index} className={this.state.group === group ? 'active' : ''} onClick={() => this.setState({ group })}>{group}</li>
-        })
+        });
 
         const similarChords = parallels.chords.reduce((chords, chord, index) => {
             return chords.concat(chord.roots.map(root => ({ root, symbol: chord.symbol })));
@@ -275,12 +293,28 @@ export default class Explorer extends React.Component {
         const similarScales = parallels.scales.reduce((scales, scale, index) => {
             return scales.concat(scale.roots.map(root => ({ root, symbol: scale.symbol })));
         }, []).map((scale, index) => <li key={index} className={this.scaleClasses(scale.symbol, parallels, supersets, subsets, this.state.tonic !== scale.root)} onClick={() => this.setState({ scale: scale.symbol, chord: null, tonic: scale.root })}>{scale.root} {scale.symbol}</li>);
+
+        const subChords = parallels.chords.reduce((chords, chord, index) => {
+            return chords.concat(chord.sub.map(root => ({ root, symbol: chord.symbol })));
+        }, []).map((chord, index) => <li key={index} className={this.chordClasses(chord.symbol, parallels, supersets, subsets, this.state.tonic !== chord.root)} onClick={() => this.setState({ scale: null, chord: chord.symbol, tonic: chord.root })}>{chord.root}{chord.symbol}</li>);
+
+        const subScales = parallels.scales.reduce((scales, scale, index) => {
+            return scales.concat(scale.sub.map(root => ({ root, symbol: scale.symbol })));
+        }, []).map((scale, index) => <li key={index} className={this.scaleClasses(scale.symbol, parallels, supersets, subsets, this.state.tonic !== scale.root)} onClick={() => this.setState({ scale: scale.symbol, chord: null, tonic: scale.root })}>{scale.root} {scale.symbol}</li>);
+
+
         const similar = similarChords.concat(similarScales).length > 0 ? (
             <div>
-                <h2>Relatives</h2>
+                <h2>Includes</h2>
+                {/*  <h5>Equal Notes</h5>
                 <ul>
                     {similarChords}
                     {similarScales}
+                </ul>
+                <h5>Less Notes</h5> */}
+                <ul>
+                    {subChords}
+                    {subScales}
                 </ul>
             </div>) : '';
 

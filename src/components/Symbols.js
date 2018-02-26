@@ -184,5 +184,3 @@ export function scaleName(symbol, long = false) {
 export function chordName(symbol, long = false) {
     return symbolName(symbol, chords, long);
 }
-
-console.log('group names', groupNames());

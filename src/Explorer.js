@@ -9,7 +9,7 @@ import * as Scale from 'tonal-scale';
 import PianoKeyboard from './components/PianoKeyboard';
 import Score from './components/Score';
 import CircleSet from './components/CircleSet';
-import { chords, scales, scaleNames, scaleName, chordNames, chordName, groupNames } from './components/Symbols';
+import { scaleNames, scaleName, chordNames, chordName, groupNames } from './components/Symbols';
 
 /* import * as Interval from 'tonal-interval'; */
 /* import * as Distance from "tonal-distance" */
@@ -345,8 +345,6 @@ export default class Explorer extends React.Component {
         const superScales = parallels.scales.reduce((scales, scale, index) => {
             return scales.concat(scale.super.map(root => ({ root, symbol: scale.symbol }))).sort(this.sortByDistanceToTonic(tonic));
         }, []).map((scale, index) => <li key={index} className={this.scaleClasses(scale.symbol, parallels, supersets, subsets, this.state.tonic !== scale.root)} onClick={() => this.setState({ scale: scale.symbol, chord: null, tonic: scale.root })}>{scale.root} {scale.symbol}</li>);
-        console.log('superscales', superScales);
-
 
         const similar = similarChords.concat(similarScales).length > 0 ? (
             <div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import standards from './assets/standards.json';
-import Song from './Song';
+/* import Song from './Song'; */
 import Explorer from './Explorer';
 
 export default class Songs extends React.Component {
@@ -19,13 +19,13 @@ export default class Songs extends React.Component {
     this.setState({ song });
   }
   render() {
-    const songs = standards.map((song, index) => (
+    /* const songs = standards.map((song, index) => (
       <li key={index}>
         <a onClick={() => this.select(song)}>
           {song.title}
         </a>
       </li>
-    ));
+    )); */
     return (
       <div>
         <Explorer />

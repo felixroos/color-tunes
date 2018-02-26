@@ -126,9 +126,13 @@ export const scales = [
     {
         symbol: 'locrian',
         groups: ['Basic', 'Diatonic'],
+    },
+    {
+        symbol: 'whole tone',
+        groups: ['Advanced']
     }
     /*iwato pelog in-sen ritusen egyptian scriabin hirajoshi kumoijoshi malkos raga vietnamese 1 vietnamese 2  ionian pentatonic lydian pentatonic locrian pentatonic flat six pentatonic minor six pentatonic minor #7M pentatonic lydian #5P pentatonic whole tone pentatonic mixolydian pentatonic flat three pentatonic super locrian pentatonic major flat two pentatonic lydian dominant pentatonic neopolitan major pentatonic
-    piongio augmented whole tone mystery #1 prometheus major blues minor hexatonic six tone symmetric prometheus neopolitan
+    piongio augmented  mystery #1 prometheus major blues minor hexatonic six tone symmetric prometheus neopolitan
      persian   spanish altered oriental flamenco balinese  dorian #4 todi raga enigmatic lydian #9 neopolitan locrian #2  lydian minor melodic minor locrian major harmonic minor romanian minor harmonic major hungarian major hungarian minor lydian dominant lydian augmented ionian augmented neopolitan minor neopolitan major lydian diminished leading whole tone augmented heptatonic double harmonic major double harmonic lydian melodic minor fifth mode melodic minor second mode
     bebop kafi raga diminished purvi raga ichikosucho bebop minor minor bebop bebop major bebop locrian bebop dominant spanish heptatonic minor six diminished
     composite blues

@@ -38,7 +38,7 @@ export default class CircleSet extends React.Component {
         if (typeof size === 'string') {
             size = size.replace('px', '')
         }
-        size = parseInt(size);
+        size = parseInt(size, 10);
         const center = size / 2;
         const strokeWidth = size * 0.1;
         const radius = size / 2 - strokeWidth / 2;
@@ -77,9 +77,7 @@ export default class CircleSet extends React.Component {
         // render note labels
         const fontsize = size / 12;
         const fontclinch = 0.9;
-        function noteInfo(note) {
-            console.log('note', note);
-        }
+
         const positions = [];
         notes.forEach((note, i) => {
             positions.push(center + radius * Math.cos((offset + i - 3) * radians) * clinch);
@@ -93,7 +91,7 @@ export default class CircleSet extends React.Component {
                 const y = center + radius * Math.sin((offset + i - 3) * radians) * fontclinch + fontsize / 3;
                 const color = stepColor(i, this.props.flip);
                 return (
-                    <text x={x} y={y} onClick={() => noteInfo(note)} onClick={(e) => handleClick(e, note)}
+                    <text x={x} y={y} onClick={(e) => handleClick(e, note)}
                         fontFamily="Verdana" fontSize={fontsize} key={i} fill={color} onMouseOver={(e) => this.enter(e)}
                         onMouseOut={(e) => this.leave(e)}>
                         {note}
@@ -141,7 +139,7 @@ export default class CircleSet extends React.Component {
                 <polygon className="background" points={positions.join(' ')} />
                 <circle className="tonic" cx={tonicPosition.x} cy={tonicPosition.y} r={3} fill={color} />
                 <polygon className="shape" points={(animated ? this.history[1] : this.history[0]).join(' ')} fill={color}>
-                    
+
                     {animation}
                 </polygon>
                 {line}

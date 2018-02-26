@@ -125,7 +125,7 @@ export default class Explorer extends React.Component {
                         return this.isChromaChild(chroma, this.scaleChroma(root, type))
                     }),
                 }
-            }).filter(p => p.roots.length || p.sub.length)
+            }).filter(p => p.roots.length || p.sub.length || p.super.length)
                 /* .filter(this.filterScaleLength(7))
                 .sort(this.sortByScaleLength()) */,
             chords: chordNames(this.state.group).map(type => {
@@ -141,7 +141,7 @@ export default class Explorer extends React.Component {
                         return this.isChromaChild(chroma, this.scaleChroma(root, type))
                     }),
                 }
-            }).filter(p => p.roots.length || p.sub.length)
+            }).filter(p => p.roots.length || p.sub.length || p.super.length)
             /* .filter(this.filterChordLength(4))
             .sort(this.sortByChordLength()) */
         };
@@ -345,6 +345,7 @@ export default class Explorer extends React.Component {
         const superScales = parallels.scales.reduce((scales, scale, index) => {
             return scales.concat(scale.super.map(root => ({ root, symbol: scale.symbol }))).sort(this.sortByDistanceToTonic(tonic));
         }, []).map((scale, index) => <li key={index} className={this.scaleClasses(scale.symbol, parallels, supersets, subsets, this.state.tonic !== scale.root)} onClick={() => this.setState({ scale: scale.symbol, chord: null, tonic: scale.root })}>{scale.root} {scale.symbol}</li>);
+        console.log('superscales', superScales);
 
 
         const similar = similarChords.concat(similarScales).length > 0 ? (
@@ -358,10 +359,10 @@ export default class Explorer extends React.Component {
                     {similarChords}
                     {similarScales}
                 </ul>
-                {/* <ul className="scroll">
+                <ul className="scroll">
                     {superChords}
                     {superScales}
-                </ul> */}
+                </ul>
             </div>) : '';
 
         // TODO: preview chord/scale on hover in circle (under current)

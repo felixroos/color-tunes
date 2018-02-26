@@ -89,7 +89,7 @@ export const chords = [
     {
         symbol: 'M7#5',
         groups: ['Advanced', 'Diatonic'],
-        short:'△7#5'
+        short: '△7#5'
     },
     {
         symbol: '7sus4',
@@ -115,7 +115,7 @@ m13 13#11 M13#11 13b9#11 9#11b13 13#9#11 7b9b13#11 7#9#11b13
 export const scales = [
     {
         symbol: 'major pentatonic',
-        groups: ['Basic'],
+        groups: ['Basic', 'Pentatonic'],
     },
     {
         symbol: 'minor pentatonic',

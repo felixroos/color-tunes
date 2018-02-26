@@ -138,7 +138,7 @@ export default class Explorer extends React.Component {
                         return this.isChromaChild(this.chordChroma(root, type), chroma)
                     }),
                     super: this.chromatics.filter(root => {
-                        return this.isChromaChild(chroma, this.scaleChroma(root, type))
+                        return this.isChromaChild(chroma, this.chordChroma(root, type))
                     }),
                 }
             }).filter(p => p.roots.length || p.sub.length || p.super.length)

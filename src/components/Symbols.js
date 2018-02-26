@@ -4,14 +4,14 @@ import * as Scale from 'tonal-scale';
 export const chords = [
     {
         symbol: 'm',
-        long: 'Moll',
+        long: 'minor',
         short: '-',
         groups: ['Basic']
     },
     {
         symbol: 'M',
-        long: 'Dur',
-        short: '^',
+        long: 'major',
+        short: '△',
         groups: ['Basic']
     },
     {
@@ -41,7 +41,7 @@ export const chords = [
     {
         symbol: 'M6',
         groups: ['Advanced'],
-        long: 'Dur 6',
+        long: 'major 6',
         short: '6'
     },
     {
@@ -52,19 +52,20 @@ export const chords = [
     {
         symbol: 'm7',
         groups: ['Basic', 'Diatonic', 'Modes'],
-        long: 'Moll 7',
+        long: 'minor 7',
         short: '-7'
     },
     {
         symbol: 'oM7',
         groups: ['Expert'],
-        long: 'Vermindert major 7',
-        short: 'o^7'
+        long: 'diminished major 7',
+        short: 'o△7'
     },
     {
         symbol: 'm7b5',
         groups: ['Basic', 'Diatonic', 'Modes'],
         long: 'Halbvermindert',
+        short: '-7b5'
     },
     {
         symbol: '7#5',
@@ -75,10 +76,11 @@ export const chords = [
         symbol: 'Maj7',
         groups: ['Basic', 'Diatonic', 'Modes'],
         long: 'Major 7',
-        short: '^7'
+        short: '△7'
     },
     {
         symbol: 'mMaj7',
+        short: '-△7',
         groups: ['Advanced', 'Diatonic']
     },
     {
@@ -96,7 +98,7 @@ export const chords = [
     {
         symbol: 'M9',
         groups: ['Advanced'],
-        short: '^9'
+        short: '△9'
     }
     /*
 7b13 M7b5 m7#5 9no5  M7b6 7b5 Madd9 mb6b9 mb6M7 madd4 sus24 madd9 Maddb9 +add#9 M7sus4 7#5sus4 M#5add9 M7#5sus4
@@ -331,7 +333,7 @@ export const levels = ['Basic', 'Advanced', 'Expert'];
 export function groupFilter(group) {
     return (item) => {
         const level = Math.max(item.groups.filter(group => levels.indexOf(group) !== -1)
-            .map(group => levels.indexOf(group)));
+            .map(group => levels.indexOf(group) + 1));
         const groups = level > 0 ? Array.from(new Set(levels.slice(level).concat(item.groups))) : item.groups;
         return groups.indexOf(group) !== -1;
     };
@@ -363,8 +365,8 @@ export function symbolName(symbol, pool, long) {
     if (!match) {
         return symbol;
     }
-    return symbol;
-    /* return (long ? match.long : match.short) || symbol; */
+    /* return symbol; */
+    return (long ? match.long : match.short) || symbol;
 }
 
 export function scaleName(symbol, long = false) {

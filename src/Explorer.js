@@ -6,15 +6,22 @@ import * as Note from 'tonal-note';
 import * as PcSet from 'tonal-pcset';
 import * as Distance from 'tonal-distance';
 import * as Scale from 'tonal-scale';
+import * as Key from 'tonal-key';
 import PianoKeyboard from './components/PianoKeyboard';
 import Score from './components/Score';
 import CircleSet from './components/CircleSet';
 import { scaleNames, scaleName, chordNames, chordName, groupNames } from './components/Symbols';
-
-/* import * as Interval from 'tonal-interval'; */
-/* import * as Distance from "tonal-distance" */
-
 import './Explorer.css';
+/* import * as Interval from 'tonal-interval'; */
+
+/* console.log(Scale.modeNames('major'));
+console.log(Scale.chords('major'));
+console.log(Key.chords('A melodic minor'));
+console.log(Key.fromAlter(-2));
+console.log(Key.modeNames()); */
+/* console.log(Key.relative("major", "B locrian")); */
+/* console.log(Key.scale("C minor"));  */ // only works with mode names
+/* console.log(Key.secDomChords('C major')); */
 
 const center = pc =>
     pc ? (pc[0] === "A" || pc[0] === "B" ? pc + 3 : pc + 4) : null;
@@ -194,6 +201,15 @@ export default class Explorer extends React.Component {
         return this.symbolClasses('chord', chord, parallels, supersets, subsets, differentRoot);
     }
 
+
+    chordList(chordItems, parallels, supersets, subsets) {
+        return chordItems.map((chord, index) => <li key={index} className={this.chordClasses(chord.symbol, parallels, supersets, subsets, this.state.tonic !== chord.root)} onClick={() => this.setState({ scale: null, chord: chord.symbol, tonic: chord.root })}>{chord.root}{chordName(chord.symbol)}</li>);
+    }
+
+    scaleList(scaleItems, parallels, supersets, subsets) {
+        return scaleItems.map((scale, index) => <li key={index} className={this.scaleClasses(scale.symbol, parallels, supersets, subsets, this.state.tonic !== scale.root)} onClick={() => this.setState({ scale: scale.symbol, chord: null, tonic: scale.root })}>{scale.root} {scaleName(scale.symbol)}</li>);
+    }
+
     scaleClasses(scale, parallels, supersets, subsets, differentRoot) {
         return this.symbolClasses('scale', scale, parallels, supersets, subsets, differentRoot);
     }
@@ -324,47 +340,48 @@ export default class Explorer extends React.Component {
 
         const similarChords = parallels.chords.reduce((chords, chord, index) => {
             return chords.concat(chord.roots.map(root => ({ root, symbol: chord.symbol }))).sort(this.sortByDistanceToTonic(tonic));
-        }, []).map((chord, index) => <li key={index} className={this.chordClasses(chord.symbol, parallels, supersets, subsets, this.state.tonic !== chord.root)} onClick={() => this.setState({ scale: null, chord: chord.symbol, tonic: chord.root })}>{chord.root}{chordName(chord.symbol)}</li>);
+        }, []);
 
         const similarScales = parallels.scales.reduce((scales, scale, index) => {
             return scales.concat(scale.roots.map(root => ({ root, symbol: scale.symbol }))).sort(this.sortByDistanceToTonic(tonic));
-        }, []).map((scale, index) => <li key={index} className={this.scaleClasses(scale.symbol, parallels, supersets, subsets, this.state.tonic !== scale.root)} onClick={() => this.setState({ scale: scale.symbol, chord: null, tonic: scale.root })}>{scale.root} {scaleName(scale.symbol)}</li>);
+        }, []);
 
         const subChords = parallels.chords.reduce((chords, chord, index) => {
             return chords.concat(chord.sub.map(root => ({ root, symbol: chord.symbol }))).sort(this.sortByDistanceToTonic(tonic));
-        }, []).map((chord, index) => <li key={index} className={this.chordClasses(chord.symbol, parallels, supersets, subsets, this.state.tonic !== chord.root)} onClick={() => this.setState({ scale: null, chord: chord.symbol, tonic: chord.root })}>{chord.root}{chordName(chord.symbol)}</li>);
+        }, []);
 
         const subScales = parallels.scales.reduce((scales, scale, index) => {
             return scales.concat(scale.sub.map(root => ({ root, symbol: scale.symbol }))).sort(this.sortByDistanceToTonic(tonic));
-        }, []).map((scale, index) => <li key={index} className={this.scaleClasses(scale.symbol, parallels, supersets, subsets, this.state.tonic !== scale.root)} onClick={() => this.setState({ scale: scale.symbol, chord: null, tonic: scale.root })}>{scale.root} {scaleName(scale.symbol)}</li>);
+        }, []);
 
         const superChords = parallels.chords.reduce((chords, chord, index) => {
             return chords.concat(chord.super.map(root => ({ root, symbol: chord.symbol }))).sort(this.sortByDistanceToTonic(tonic));
-        }, []).map((chord, index) => <li key={index} className={this.chordClasses(chord.symbol, parallels, supersets, subsets, this.state.tonic !== chord.root)} onClick={() => this.setState({ scale: null, chord: chord.symbol, tonic: chord.root })}>{chord.root}{chordName(chord.symbol)}</li>);
+        }, []);
 
         const superScales = parallels.scales.reduce((scales, scale, index) => {
             return scales.concat(scale.super.map(root => ({ root, symbol: scale.symbol }))).sort(this.sortByDistanceToTonic(tonic));
-        }, []).map((scale, index) => <li key={index} className={this.scaleClasses(scale.symbol, parallels, supersets, subsets, this.state.tonic !== scale.root)} onClick={() => this.setState({ scale: scale.symbol, chord: null, tonic: scale.root })}>{scale.root} {scaleName(scale.symbol)}</li>);
+        }, []);
+
 
         const similar = (
             <div>
                 <h2>Material</h2>
-                <ul className="scroll">
-                    {subChords}
-                {/* </ul>
-                <ul className="scroll"> */}
-                    {subScales}
-                </ul>
-                <ul className="scroll">
-                    {similarChords}
-                    {similarScales}
-                </ul>
-                <ul className="scroll">
-                    {superChords}
-                {/* </ul>
-                <ul className="scroll"> */}
-                    {superScales}
-                </ul>
+                {subChords.length ? <ul className="scroll">
+                    {this.chordList(subChords, parallels, supersets, subsets)}
+                </ul> : ''}
+                {subScales.length ? <ul className="scroll">
+                    {this.scaleList(subScales, parallels, supersets, subsets)}
+                </ul> : ''}
+                {(similarChords.concat(similarScales)).length ? <ul className="scroll">
+                    {this.chordList(similarChords, parallels, supersets, subsets)}
+                    {this.scaleList(similarScales, parallels, supersets, subsets)}
+                </ul> : ''}
+                {superChords.length ? <ul className="scroll">
+                    {this.chordList(superChords, parallels, supersets, subsets)}
+                </ul> : ''}
+                {superScales.length ? <ul className="scroll">
+                    {this.scaleList(superScales, parallels, supersets, subsets)}
+                </ul> : ''}
             </div>);
 
         // TODO: preview chord/scale on hover in circle (under current)

@@ -10,7 +10,7 @@ import * as Key from 'tonal-key';
 import PianoKeyboard from './components/PianoKeyboard';
 import Score from './components/Score';
 import CircleSet from './components/CircleSet';
-import { scaleNames, scaleName, chordNames, chordName, groupNames } from './components/Symbols';
+import { scaleNames, scaleName, chordNames, chordName, groupNames, randomChord, randomScale, randomItem } from './components/Symbols';
 import './Explorer.css';
 /* import * as Interval from 'tonal-interval'; */
 
@@ -31,13 +31,16 @@ export default class Explorer extends React.Component {
 
     constructor() {
         super();
+        const isChord = Math.random() > 0.5;
+        const group = 'Advanced';
         this.state = {
             circle: 'fourths',
-            tonic: 'D',
-            scale: 'dorian',
+            tonic: randomItem(this.chromatics),
+            scale: !isChord ? randomScale(group) : null,
+            chord: isChord ? randomChord(group) : null,
             history: [],
             extended: true,
-            group: 'Advanced'
+            group
         };
     }
 
@@ -223,6 +226,7 @@ export default class Explorer extends React.Component {
             return;
         }
         tonic = this.state.tonic;
+        
         if (this.state.scale) {
             notes = this.removeOctaves(Scale.notes(tonic, this.state.scale));
             chroma = PcSet.chroma(notes);
@@ -406,6 +410,17 @@ export default class Explorer extends React.Component {
                     <ul>
                         {circles}
                     </ul>
+                    <h2>Help</h2>
+                    This tool visualizes the connection between musical chords and scales. The colors have the following meanings:
+                    <ul>
+                        <li className="active">currently selected</li>
+                        <li className="parallel">contains the same notes (same shape)</li>
+                        <li className="sub">abstraction of the current selection (less notes)</li>
+                        <li className="super">extension of the current selection (more notes)</li>
+                    </ul>
+                    You can change the current root by pressing a piano key or clicking the note in the circle.<br />
+                    In the Material view, all listed chords and scales are abstractions or extensions but only the ones with the current selected root are highlighted.<br />
+                    You can filter the displayed chords and scales to focus on specific connections.
                 </div>
             </div >
         );

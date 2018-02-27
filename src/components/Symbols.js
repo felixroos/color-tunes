@@ -380,3 +380,15 @@ export function scaleName(symbol, long = false) {
 export function chordName(symbol, long = false) {
     return symbolName(symbol, chords, long);
 }
+
+export function randomItem(array) {
+    return array[Math.floor(Math.random() * array.length)];
+}
+
+export function randomScale(group) {
+    return randomItem(scaleNames(group));
+}
+
+export function randomChord(group) {
+    return randomItem(chordNames(group));
+}

@@ -40,6 +40,7 @@ export default class Explorer extends React.Component {
             chord: isChord ? randomChord(group) : null,
             history: [],
             extended: true,
+            flip: false,
             group
         };
     }
@@ -226,7 +227,7 @@ export default class Explorer extends React.Component {
             return;
         }
         tonic = this.state.tonic;
-        
+
         if (this.state.scale) {
             notes = this.removeOctaves(Scale.notes(tonic, this.state.scale));
             chroma = PcSet.chroma(notes);
@@ -366,8 +367,7 @@ export default class Explorer extends React.Component {
             return scales.concat(scale.super.map(root => ({ root, symbol: scale.symbol }))).sort(this.sortByDistanceToTonic(tonic));
         }, []);
 
-
-        const similar = (
+        const material = (
             <div>
                 <h2>Material</h2>
                 {subChords.length ? <ul className="scroll">
@@ -388,6 +388,16 @@ export default class Explorer extends React.Component {
                 </ul> : ''}
             </div>);
 
+        const chordsAndScales = (
+            <div>
+                <h2>Chords & Scales</h2>
+                {chordGroups}
+                {scaleGroups}
+            </div>);
+        let views = [material, chordsAndScales];
+        if (this.state.flip) {
+            views = views.reverse();
+        }
         // TODO: preview chord/scale on hover in circle (under current)
         return (
             <div className="explorer" >
@@ -396,31 +406,32 @@ export default class Explorer extends React.Component {
                     {piano}
                     {score}
                     {circle}
-                    {similar}
-                    <h2>Chords</h2>
-                    {chordGroups}
-                    <h2>Scales</h2>
-                    {scaleGroups}
+                    {views}
                     <h2>Settings</h2>
                     <h5>Filter</h5>
-                    <ul>
+                    <ul className="scroll">
                         {groups}
                     </ul>
                     <h5>Circle of</h5>
-                    <ul>
+                    <ul className="scroll">
                         {circles}
+                    </ul>
+                    <h5>Flip Views</h5>
+                    <ul>
+                        <li className={this.state.flip ? 'active' : ''} onClick={() => this.setState({ flip: !this.state.flip })}>flip{this.state.flip ? 'ped' : ''}</li>
                     </ul>
                     <h2>Help</h2>
                     This tool visualizes the connection between musical chords and scales. The colors have the following meanings:
                     <ul>
                         <li className="active">currently selected</li>
-                        <li className="parallel">contains the same notes (same shape)</li>
+                        <li className="parallel">has equal structure (same shape/intervals)</li>
                         <li className="sub">abstraction of the current selection (less notes)</li>
                         <li className="super">extension of the current selection (more notes)</li>
                     </ul>
                     You can change the current root by pressing a piano key or clicking the note in the circle.<br />
                     In the Material view, all listed chords and scales are abstractions or extensions but only the ones with the current selected root are highlighted.<br />
-                    You can filter the displayed chords and scales to focus on specific connections.
+                    You can filter the displayed chords and scales to focus on specific connections.<br />
+                    <strong>Pro Tip: </strong> You scroll/swipe the listings horizontally!
                 </div>
             </div >
         );

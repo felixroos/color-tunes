@@ -23,11 +23,6 @@ li {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
-.explorer {
-    /* display: flex; */
-    /* flex-wrap: wrap; */
-}
-
 .symbols {
     display: inline-block;
     padding: 0 10px;

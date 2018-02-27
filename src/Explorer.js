@@ -403,22 +403,25 @@ export default class Explorer extends React.Component {
             <div className="explorer" >
                 <div className="symbols">
                     {label}
-                    {piano}
-                    {score}
-                    {circle}
+                    {!this.state.hidePiano ? piano : ''}
+                    {!this.state.hideScore ? score : ''}
+                    {!this.state.hideCircle ? circle : ''}
                     {views}
                     <h2>Settings</h2>
                     <h5>Filter</h5>
                     <ul className="scroll">
                         {groups}
                     </ul>
-                    <h5>Circle of</h5>
+                    <h5>Circle</h5>
                     <ul className="scroll">
                         {circles}
                     </ul>
-                    <h5>Flip Views</h5>
+                    <h5>Views</h5>
                     <ul>
-                        <li className={this.state.flip ? 'active' : ''} onClick={() => this.setState({ flip: !this.state.flip })}>flip{this.state.flip ? 'ped' : ''}</li>
+                        <li className={this.state.flip ? 'active' : ''} onClick={() => this.setState({ flip: !this.state.flip })}>Flip</li>
+                        <li className={!this.state.hidePiano ? 'active' : ''} onClick={() => this.setState({ hidePiano: !this.state.hidePiano })}>Piano</li>
+                        <li className={!this.state.hideScore ? 'active' : ''} onClick={() => this.setState({ hideScore: !this.state.hideScore })}>Score</li>
+                        <li className={!this.state.hideCircle ? 'active' : ''} onClick={() => this.setState({ hideCircle: !this.state.hideCircle })}>Circle</li>
                     </ul>
                     <h2>Help</h2>
                     This tool visualizes the connection between musical chords and scales. The colors have the following meanings:

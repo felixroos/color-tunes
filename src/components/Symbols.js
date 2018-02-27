@@ -359,9 +359,9 @@ export function chordNames(group = 'Basic') {
 }
 
 export function groupNames() {
-    return Array.from(new Set(scales.concat(chords)
+    return Array.from(new Set(levels.concat(scales.concat(chords)
         .map(item => item.groups)
-        .reduce((groups, current) => groups.concat(current), ['All'])));
+        .reduce((groups, current) => groups.concat(current))))).concat(['All']);
 }
 
 export function symbolName(symbol, pool, long) {

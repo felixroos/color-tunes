@@ -46,7 +46,6 @@ export default class Player extends React.Component {
       measures.forEach((chords, m) => {
         setTimeout(() => {
           const chordInterval = measureInterval / chords.length;
-          console.log('chords interval', chordInterval);
           chords.forEach((chord, c) => {
             setTimeout(() => {
               this.playChord(chord);

@@ -7,7 +7,7 @@ import { stepColor } from './Colorizer';
 export default class CircleSet extends React.Component {
     /* constructor({ size = 300, offset = 0, chroma = '0', type = 'set', tonic = 'C', flip = false, chromatic = false, onClick, notes, focus, interval }) { */
 
-    history = [[0, 0, 0, 0, 0, 0]];
+    history = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
     /* animations = []; */
 
     constructor(props) {
@@ -65,13 +65,18 @@ export default class CircleSet extends React.Component {
         }
         // calculcate polygon points
         const clinch = 0.8;
-        const points = chroma.split('').reduce((points, value, i) => {
+        let points = chroma.split('').reduce((points, value, i) => {
             if (value === '1') {
                 points.push(Math.round(center + radius * Math.cos((offset + i - 3) * radians) * clinch));
                 points.push(Math.round(center + radius * Math.sin((offset + i - 3) * radians) * clinch));
             }
             return points;
         }, []);
+        const fill = (24 - points.length) / 2;
+
+        for (let p = 0; p < fill; ++p) {
+            points = points.concat([points[0], points[1]]);
+        }
         this.history.unshift(points);
 
         // render note labels

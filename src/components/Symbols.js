@@ -332,6 +332,8 @@ export const scales = [
     */
 ];
 
+export const symbols = { chords, scales };
+
 export const levels = ['Basic', 'Advanced', 'Expert'];
 
 export function groupFilter(group) {
@@ -364,7 +366,8 @@ export function groupNames() {
         .reduce((groups, current) => groups.concat(current))))).concat(['All']);
 }
 
-export function symbolName(symbol, pool, long) {
+export function symbolName(type, symbol, long) {
+    const pool = symbols[type + 's'];
     const match = pool.find(item => item.symbol === symbol);
     if (!match) {
         return symbol;
@@ -374,11 +377,11 @@ export function symbolName(symbol, pool, long) {
 }
 
 export function scaleName(symbol, long = false) {
-    return symbolName(symbol, scales, long);
+    return symbolName('scale', symbol, long);
 }
 
 export function chordName(symbol, long = false) {
-    return symbolName(symbol, chords, long);
+    return symbolName('chord', symbol, long);
 }
 
 export function randomItem(array) {

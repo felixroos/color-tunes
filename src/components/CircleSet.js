@@ -5,10 +5,7 @@ import "./CircleSet.css";
 import { stepColor } from './Colorizer';
 // check https://codepen.io/n0o0/pen/BpdzOZ
 export default class CircleSet extends React.Component {
-    /* constructor({ size = 300, offset = 0, chroma = '0', type = 'set', tonic = 'C', flip = false, chromatic = false, onClick, notes, focus, interval }) { */
-
     history = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
-    /* animations = []; */
 
     constructor(props) {
         super();
@@ -133,7 +130,12 @@ export default class CircleSet extends React.Component {
             animation = <animate fill="freeze" key={this.history.length} ref={(animation) => { this.startAnimation(animation) }} attributeName="points" dur="200ms" from={this.history[1].join(' ')} to={this.history[0].join(' ')} />
             /* this.animations.push(animation); */
         }
+        let skeletons = '';
 
+        if (this.props.skeletons) {
+            console.log('skeletons', this.props.skeletons);
+
+        }
         return (
             <svg
                 className={classNames}
@@ -142,6 +144,7 @@ export default class CircleSet extends React.Component {
                 viewBox={`0 0 ${this.props.size} ${this.props.size}`}
             >
                 <polygon className="background" points={positions.join(' ')} />
+                {skeletons}
                 <circle className="tonic" cx={tonicPosition.x} cy={tonicPosition.y} r={3} fill={color} />
                 <polygon className="shape" points={(animated ? this.history[1] : this.history[0]).join(' ')} fill={color}>
 

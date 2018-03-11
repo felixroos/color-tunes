@@ -1,7 +1,6 @@
 import React from 'react';
 import standards from './assets/standards.json';
 import Song from './Song';
-import Explorer from './Explorer';
 
 export default class Songs extends React.Component {
   constructor() {

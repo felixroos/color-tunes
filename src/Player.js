@@ -1,5 +1,5 @@
 import React from 'react';
-/* import { sounds } from './assets/sounds/sounds.js'; */
+import { sounds } from './assets/sounds/sounds.js';
 import { transpose } from 'tonal';
 import * as Chord from 'tonal-chord';
 import * as Note from 'tonal-note';
@@ -19,17 +19,18 @@ export default class Player extends React.Component {
     this.state = {
       chord: null,
       scale: 'major',
-      history: []
+      history: [],
+      circle: 'fourths' // fifths, chromatics
     };
   }
 
   playChord(chord) {
     const notes = Chord.notes(getTonalChord(chord));
     notes.forEach(note => {
-      /* const index = Note.chroma(note) + 36; */
-      /* var audio = new Audio(sounds[index - 16]); */
-      /* audio.play(); */
-      console.warn('Audio is currently not available');
+      const index = Note.chroma(note) + 36;
+      var audio = new Audio(sounds[index - 16]);
+      audio.play();
+      /* console.warn('Audio is currently not available'); */
     });
     this.setState({ history: this.state.history.concat([chord]), chord });
   }
@@ -38,20 +39,23 @@ export default class Player extends React.Component {
     return 60 / bpm * beatsPerMeasure * 1000;
   }
 
-  playTune(measures = this.props.measures, bpm = 90, beatsPerMeasure = 4) {
-    const interval = this.getTimePerMeasure(bpm, beatsPerMeasure);
-    measures.forEach((chords, index) => {
-      setTimeout(() => {
-        const interval = this.getTimePerMeasure(bpm, beatsPerMeasure) / chords.length;
-        chords.forEach((chord, index) => {
-          this.playChord(chord);
-          setTimeout(() => {
-            this.setState({ chord });
-          }, interval * index);
-        });
-
-      }, index * interval);
-    });
+  playTune(measures = this.props.measures, bpm = 220, beatsPerMeasure = 4, forms = 2) {
+    const measureInterval = this.getTimePerMeasure(bpm, beatsPerMeasure);
+    for (let i = 0; i < forms; ++i) {
+      const formDelay = measureInterval * i * measures.length;
+      measures.forEach((chords, m) => {
+        setTimeout(() => {
+          const chordInterval = measureInterval / chords.length;
+          console.log('chords interval', chordInterval);
+          chords.forEach((chord, c) => {
+            setTimeout(() => {
+              this.playChord(chord);
+              this.setState({ chord });
+            }, chordInterval * c);
+          });
+        }, m * measureInterval + formDelay);
+      });
+    }
   }
 
   render() {
@@ -76,10 +80,10 @@ export default class Player extends React.Component {
       circle = (<CircleSet
         chroma={chroma}
         tonic={tonic}
+        size="350"
+        flip={this.state.circle === 'fifths'}
+        chromatic={this.state.circle === 'chromatics'}
       />);
-
-      // keyTonic={tokens[0]}  
-      score = <Score notes={scorenotes} />
     }
     if (this.state.tonic && this.state.scale) {
       const tonic = this.state.tonic;
@@ -104,25 +108,13 @@ export default class Player extends React.Component {
       />);
     }
 
-    const tonics = ['C', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'F#', 'B', 'E', 'A', 'D', 'G']
-      .map((tonic, index) =>
-        (<li key={index} onClick={() => this.setState({ tonic })}>{tonic}</li>)
-      )
-    /* const scales = Scale.names() */
-    const scales = ['lydian', 'major', 'mixolydian', 'dorian', 'aeolian', 'phrygian', 'locrian']
-      .map((scale, index) =>
-        (<li key={index} onClick={() => this.setState({ scale })}>{scale}</li>)
-      )
-
     return (
       <div className="player">
         {piano}
         {label}
         {circle}
-        {score}
+        {/* score */}
         <ul>
-          {tonics}
-          {scales}
           <li>
             <a onClick={() => this.playTune()}>
               Play

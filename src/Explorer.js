@@ -6,7 +6,7 @@ import * as Note from 'tonal-note';
 import * as PcSet from 'tonal-pcset';
 import * as Distance from 'tonal-distance';
 import * as Scale from 'tonal-scale';
-import * as Key from 'tonal-key';
+/* import * as Key from 'tonal-key'; */
 import PianoKeyboard from './components/PianoKeyboard';
 import Score from './components/Score';
 import CircleSet from './components/CircleSet';
@@ -368,7 +368,7 @@ export default class Explorer extends React.Component {
         }, []);
 
         const material = (
-            <div>
+            <div key="material">
                 <h2>Material</h2>
                 {subChords.length ? <ul className="scroll">
                     {this.chordList(subChords, parallels, supersets, subsets)}
@@ -389,7 +389,7 @@ export default class Explorer extends React.Component {
             </div>);
 
         const chordsAndScales = (
-            <div>
+            <div key="chordsAndScales">
                 <h2>Chords & Scales</h2>
                 {chordGroups}
                 {scaleGroups}

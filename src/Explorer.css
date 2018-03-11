@@ -1,14 +1,11 @@
-body {
-    margin: 0 !important;
-    background: #eee;
-}
+
 
 ul {
     padding: 0;
     /* border-top: 1px solid #ccc; */
 }
 
-li {
+.explorer li {
     list-style: none;
     display: inline-block;
     min-width: 60px;

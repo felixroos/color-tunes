@@ -1,13 +1,19 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-/* import Song from './music/Song'; */
-import Songs from './Songs';
+import { render } from "react-dom";
 import './index.css';
+import { Provider } from "react-redux";
+import { initRouter } from "./router";
+import store from "./store";
+import App from "./App";
 // ========================================
 
-ReactDOM.render(
-  <div>
-    <Songs />
-  </div>,
-  document.getElementById('root')
+
+
+initRouter(store);
+
+render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById("root")
 );

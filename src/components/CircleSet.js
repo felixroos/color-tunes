@@ -29,6 +29,31 @@ export default class CircleSet extends React.Component {
         animation.beginElement();
     }
 
+    getPoints(chroma, size, offset, clinch) {
+        if (this.props.flip) {
+            offset += 1;
+            chroma = chroma.split('').reverse().join('');
+        }
+        if (!this.props.chromatic) {
+            // transform chroma from chromatic order to fourths/fifths
+            chroma = chroma.split('').map((p, i, a) => {
+                return a[i * 5 % 12];
+            }).join('');
+        }
+
+        const center = size / 2;
+        const strokeWidth = size * 0.1;
+        const radius = size / 2 - strokeWidth / 2;
+        const radians = 2 * Math.PI / 12;
+        return chroma.split('').reduce((points, value, i) => {
+            if (value === '1') {
+                points.push(Math.round(center + radius * Math.cos((offset + i - 3) * radians) * clinch));
+                points.push(Math.round(center + radius * Math.sin((offset + i - 3) * radians) * clinch));
+            }
+            return points;
+        }, []);
+    }
+
     render() {
         const animated = this.props.animated !== undefined ? this.props.animate : true;
         let size = this.props.size || 300;
@@ -40,12 +65,6 @@ export default class CircleSet extends React.Component {
         const strokeWidth = size * 0.1;
         const radius = size / 2 - strokeWidth / 2;
         let chroma = this.props.chroma || '0';
-        if (!this.props.chromatic) {
-            // transform chroma from chromatic order to fourths/fifths
-            chroma = this.props.chroma.split('').map((p, i, a) => {
-                return a[i * 5 % 12];
-            }).join('');
-        }
         // const circumference = 2 * Math.PI * radius;
         const radians = 2 * Math.PI / 12;
         let offset = this.props.offset || 0;
@@ -57,20 +76,12 @@ export default class CircleSet extends React.Component {
         }
         if (this.props.flip) {
             notes = notes.reverse();
-            offset += 1;
-            chroma = chroma.split('').reverse().join('');
         }
-        // calculcate polygon points
         const clinch = 0.8;
-        let points = chroma.split('').reduce((points, value, i) => {
-            if (value === '1') {
-                points.push(Math.round(center + radius * Math.cos((offset + i - 3) * radians) * clinch));
-                points.push(Math.round(center + radius * Math.sin((offset + i - 3) * radians) * clinch));
-            }
-            return points;
-        }, []);
-        const fill = (24 - points.length) / 2;
 
+        let points = this.getPoints(chroma, size, offset, clinch);
+
+        const fill = (24 - points.length) / 2;
         for (let p = 0; p < fill; ++p) {
             points = points.concat([points[0], points[1]]);
         }
@@ -108,6 +119,9 @@ export default class CircleSet extends React.Component {
         }
 
         const handleClick = (e, note) => {
+            if (!this.props.onClick) {
+                return;
+            }
             e.preventDefault();
             this.props.onClick(note);
         };
@@ -133,8 +147,10 @@ export default class CircleSet extends React.Component {
         let skeletons = '';
 
         if (this.props.skeletons) {
-            console.log('skeletons', this.props.skeletons);
-
+            skeletons = this.props.skeletons.map((skeleton, index) => {
+                const points = this.getPoints(skeleton, size, offset, clinch, this.state.flip);
+                return (<polygon key={index} className="skeleton" points={points.join(' ')} fill="transparent" />)
+            });
         }
         return (
             <svg
@@ -144,12 +160,11 @@ export default class CircleSet extends React.Component {
                 viewBox={`0 0 ${this.props.size} ${this.props.size}`}
             >
                 <polygon className="background" points={positions.join(' ')} />
-                {skeletons}
-                <circle className="tonic" cx={tonicPosition.x} cy={tonicPosition.y} r={3} fill={color} />
                 <polygon className="shape" points={(animated ? this.history[1] : this.history[0]).join(' ')} fill={color}>
-
                     {animation}
                 </polygon>
+                <circle className="tonic" cx={tonicPosition.x} cy={tonicPosition.y} r={5} fill={color} />
+                {skeletons}
                 {line}
                 {this.props.line}
                 {labels}

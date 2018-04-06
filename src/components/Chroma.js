@@ -168,3 +168,22 @@ export function getProps(state) {
         chord: state.chord, scale: state.scale, tonic, notes, chroma, intervals, scorenotes, label, subsets, supersets, parallels
     };
 }
+
+export function symbolClasses(type, symbol, props, differentRoot) {
+    if (props[type] === symbol && !differentRoot) {
+        return 'active';
+    }
+    const brothers = props.parallels[type + 's']
+        .filter(item => item.roots.length)
+        .filter(parallel => parallel.symbol === symbol);
+    if (brothers.length) {
+        return 'parallel'; // TODO: also check classes below and dont stop here
+    }
+    if (!differentRoot && props.supersets[type + 's'].indexOf(symbol) !== -1) {
+        return 'super';
+    }
+    if (!differentRoot && props.subsets[type + 's'].indexOf(symbol) !== -1) {
+        return 'sub';
+    }
+
+}

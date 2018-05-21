@@ -62,7 +62,7 @@ li:hover {
     text-decoration: underline;
 }
 
-li.active {
+/* li.active {
     background: #58ad3e;
 }
 
@@ -76,7 +76,7 @@ li.super {
 
 li.parallel {
     border: 1px solid #58ad3e;
-}
+} */
 
 canvas, .Piano {
     width: 100%;

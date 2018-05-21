@@ -6,7 +6,7 @@ import * as PcSet from 'tonal-pcset';
 import { sounds } from './assets/sounds/sounds.js';
 import { getTonalChord } from './chordScales';
 /* import Score from './components/Score'; */
-import CircleSet from './components/CircleSet';
+import { CircleSet } from './components/CircleSet';
 import PianoKeyboard from './components/PianoKeyboard';
 
 /* const center = pc =>

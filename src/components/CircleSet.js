@@ -5,8 +5,23 @@ import * as Note from 'tonal-note';
 import "./CircleSet.css";
 import { stepColor } from './Colorizer';
 
+export function circleIndex(index, fourths, flip) {
+    if (!fourths && !flip) {
+        return index;
+    }
+    if (!fourths) {
+        return 12 - index;
+    }
+    if (fourths && !flip) {
+        return index * 5 % 12;
+    }
+    if (fourths && flip) {
+        return (12 - index) * 5 % 12;
+    }
+}
+
 // check https://codepen.io/n0o0/pen/BpdzOZ
-export default class CircleSet extends React.Component {
+export class CircleSet extends React.Component {
     history = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
 
     constructor(props) {
@@ -39,7 +54,7 @@ export default class CircleSet extends React.Component {
         const radians = 2 * Math.PI / 12;
         if (order && this.props.ordered) {
             return order.reduce((points, i) => {
-                const index = this.circleIndex(i, !this.props.chromatic, this.props.flip);
+                const index = circleIndex(i, !this.props.chromatic, this.props.flip);
                 points.push(Math.round(center + radius * Math.cos((offset + index - 3) * radians) * clinch));
                 points.push(Math.round(center + radius * Math.sin((offset + index - 3) * radians) * clinch));
                 return points;
@@ -47,7 +62,7 @@ export default class CircleSet extends React.Component {
         }
 
         return chroma.split('').reduce((points, v, i) => {
-            const index = this.circleIndex(i, !this.props.chromatic, this.props.flip);
+            const index = circleIndex(i, !this.props.chromatic, this.props.flip);
             const value = chroma.split('')[index];
             if (value === '1') {
                 points.push(Math.round(center + radius * Math.cos((offset + i - 3) * radians) * clinch));
@@ -57,20 +72,6 @@ export default class CircleSet extends React.Component {
         }, []);
     }
 
-    circleIndex(index, fourths, flip) {
-        if (!fourths && !flip) {
-            return index;
-        }
-        if (!fourths) {
-            return 12 - index;
-        }
-        if (fourths && !flip) {
-            return index * 5 % 12;
-        }
-        if (fourths && flip) {
-            return (12 - index) * 5 % 12;
-        }
-    }
 
     render() {
         const animated = this.props.animated !== undefined ? this.props.animate : true;
@@ -95,7 +96,7 @@ export default class CircleSet extends React.Component {
         let notes = this.props.labels || ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 
         notes = notes.map((p, i, a) => {
-            return a[this.circleIndex(i, !this.props.chromatic, this.props.flip)];
+            return a[circleIndex(i, !this.props.chromatic, this.props.flip)];
         });
 
         const clinch = 0.8;
@@ -141,7 +142,7 @@ export default class CircleSet extends React.Component {
             });
         const classNames = 'Circle ' + this.props.type;
         // find out position of tonic circle
-        const tonicIndex = this.circleIndex(Note.props(this.props.tonic).chroma, !this.props.chromatic, this.props.flip);
+        const tonicIndex = circleIndex(Note.props(this.props.tonic).chroma, !this.props.chromatic, this.props.flip);
 
         const tonicPosition = {
             x: center + radius * Math.cos((offset + tonicIndex - 3) * radians) * clinch,

@@ -1,8 +1,10 @@
 // ripped from https://github.com/danigb/tonal-app/blob/master/src/components/viz/PianoKeyboard.js
+import cat from "classcat";
 import React from "react";
 import { Array, Note } from "tonal";
+import { circleIndex } from "./CircleSet";
+import { stepColor } from './Colorizer';
 import "./PianoKeyboard.css";
-import cat from "classcat";
 
 const WHITES = [0, 2, 4, 5, 7, 9, 11];
 const BLACKS = [1, 3, 6, 8, 10];
@@ -64,7 +66,7 @@ const Octave = props => {
 };
 
 export default ({
-  className,
+    className,
     setChroma,
     setTonic,
     width,
@@ -86,8 +88,32 @@ export default ({
     // const viewWidth = 1120
     const viewWidth = octs.length * 7 * WHITE_WIDTH;
     width = width || "100%";
+
+    const index = circleIndex(setTonic, true);
+    const color = stepColor(index, false);
+    const bgColor = stepColor(index, false, 80);
+
+    const style = `
+      .piano-key.active {
+        fill: ${bgColor};
+      }
+      
+      .piano-key.black.active {
+        fill: ${bgColor};
+      }
+      
+      .piano-key.white.tonic {
+        fill: ${color};
+      }
+      
+      .piano-key.black.tonic {
+        fill: ${color};
+      }
+    `;
+
     return (
         <div className={"Piano " + className}>
+            <style>{style}</style>
             <svg
                 width={width}
                 viewBox={`0 0 ${viewWidth} ${WHITE_HEIGHT}`}

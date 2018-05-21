@@ -4,7 +4,8 @@ import * as Note from 'tonal-note';
 import './Explorer.css';
 import Chords from './components/Chords';
 import { getProps } from './components/Chroma';
-import CircleSet from './components/CircleSet';
+import { CircleSet, circleIndex } from './components/CircleSet';
+import { stepColor } from './components/Colorizer';
 import Material from './components/Material';
 import PianoKeyboard from './components/PianoKeyboard';
 import Scales from './components/Scales';
@@ -109,9 +110,34 @@ export default class Explorer extends React.Component {
         if (this.state.flip) {
             views = views.reverse();
         }
+
+        const tonicIndex = circleIndex(Note.chroma(props.tonic), true);
+
+        const color = stepColor(tonicIndex, false);
+        const bgColor = stepColor(tonicIndex, false, 80);
+        const style = `
+        li.active {
+            background: ${color};
+        }
+        
+        li.sub {
+            background: ${bgColor};
+        }
+        
+        li.super {
+            background: #eee;
+        }
+        
+        li.parallel {
+            border: 1px solid ${color};
+        }
+        `;
         // TODO: preview chord/scale on hover in circle (under current)
         return (
             <div className="explorer" >
+                <style>
+                    {style}
+                </style>
                 <div className="symbols">
                     {label}
                     {!this.state.hidePiano ? piano : ''}

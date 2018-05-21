@@ -154,11 +154,12 @@ export class CircleSet extends React.Component {
                 return;
             }
             e.preventDefault();
-
-            this.props.onClick(Note.simplify(note));
+            const simple = Note.simplify(note);
+            const newTonic = this.props.tonic !== simple ? simple : Note.enharmonic(simple);
+            this.props.onClick(newTonic);
         };
-        const color = stepColor(notes.indexOf(this.props.tonic), this.props.flip);
-        const bgColor = stepColor(notes.indexOf(this.props.tonic), this.props.flip, 80);
+        const color = stepColor(tonicIndex, this.props.flip);
+        const bgColor = stepColor(tonicIndex, this.props.flip, 80);
         // hover line?
         let line = ''
         if (this.state.interval && this.state.interval.length === 2) {

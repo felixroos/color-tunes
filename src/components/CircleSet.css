@@ -11,16 +11,16 @@
 }
 
 .Circle .tonic {
-    fill: #58ad3e;
+    /* fill: #58ad3e; */
 }
 
-.Circle polygon {
+.Circle polygon, .Circle path {
     transition: all .2s linear;
 }
 
-.Circle polygon.shape {
-    fill: #d7ffc1;
-    stroke: #58ad3e;
+.Circle .shape {
+    /* fill: #d7ffc1;
+    stroke: #58ad3e; */
     /* opacity: 0.5; */
 }
 
@@ -28,17 +28,21 @@
     fill: #3a3a3a
 }
 
-.Circle polygon.blue {
+.Circle text.active {
+    fill: #c0c0c0;
+}
+
+.Circle .blue {
     fill: #65c3de;
     stroke: #4a8ea2;
 }
 
-.Circle polygon.background {
+.Circle .background {
     fill: #eee;
     stroke: #c0c0c0;
 }
 
-.Circle polygon.skeleton {
+.Circle .skeleton {
     stroke: #3a3a3a;
     stroke-dasharray: 1;
     opacity: 0.7;

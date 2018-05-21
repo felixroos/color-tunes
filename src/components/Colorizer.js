@@ -12,6 +12,6 @@ export function stepHue(step, flip = false) {
     return hue;
 }
 
-export function stepColor(step, flip = false) {
-    return `hsl(${stepHue(step, flip)},40%,50%)`;
+export function stepColor(step, flip = false, opacity = 50) {
+    return `hsl(${stepHue(step, flip)},40%,${opacity}%)`;
 }

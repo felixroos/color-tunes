@@ -1,22 +1,15 @@
 import React from 'react';
 /* import { sounds } from './assets/sounds/sounds.js'; */
 import * as Note from 'tonal-note';
-import PianoKeyboard from './components/PianoKeyboard';
-import Score from './components/Score';
+import './Explorer.css';
+import Chords from './components/Chords';
+import { getProps } from './components/Chroma';
 import CircleSet from './components/CircleSet';
 import Material from './components/Material';
-import Chords from './components/Chords';
+import PianoKeyboard from './components/PianoKeyboard';
 import Scales from './components/Scales';
-import {
-    groupNames,
-    randomChord,
-    randomScale,
-    randomItem
-} from './components/Symbols';
-import {
-    getProps,
-} from './components/Chroma'
-import './Explorer.css';
+import Score from './components/Score';
+import { groupNames, randomChord, randomItem, randomScale } from './components/Symbols';
 
 export default class Explorer extends React.Component {
     chromatics = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
@@ -33,6 +26,7 @@ export default class Explorer extends React.Component {
             history: [],
             extended: true,
             flip: false,
+            ordered: true,
             items: [],
             group
         };
@@ -65,6 +59,8 @@ export default class Explorer extends React.Component {
         circle = (<CircleSet
             size="350"
             chroma={props.chroma}
+            notes={props.notes}
+            ordered={this.state.ordered}
             skeletons={skeletons}
             onClick={(note) => this.setState({ tonic: note })}
             tonic={props.tonic}
@@ -123,6 +119,14 @@ export default class Explorer extends React.Component {
                     {!this.state.hideCircle ? circle : ''}
                     {views}
                     <h2>Settings</h2>
+                    <h5>Views</h5>
+                    <ul>
+                        <li className={this.state.flip ? 'active' : ''} onClick={() => this.setState({ flip: !this.state.flip })}>Flip</li>
+                        <li className={this.state.ordered ? 'active' : ''} onClick={() => this.setState({ ordered: !this.state.ordered })}>Ordered</li>
+                        <li className={!this.state.hidePiano ? 'active' : ''} onClick={() => this.setState({ hidePiano: !this.state.hidePiano })}>Piano</li>
+                        <li className={!this.state.hideScore ? 'active' : ''} onClick={() => this.setState({ hideScore: !this.state.hideScore })}>Score</li>
+                        <li className={!this.state.hideCircle ? 'active' : ''} onClick={() => this.setState({ hideCircle: !this.state.hideCircle })}>Circle</li>
+                    </ul>
                     <h5>Filter</h5>
                     <ul className="scroll">
                         {groups}
@@ -130,13 +134,6 @@ export default class Explorer extends React.Component {
                     <h5>Circle</h5>
                     <ul className="scroll">
                         {circles}
-                    </ul>
-                    <h5>Views</h5>
-                    <ul>
-                        <li className={this.state.flip ? 'active' : ''} onClick={() => this.setState({ flip: !this.state.flip })}>Flip</li>
-                        <li className={!this.state.hidePiano ? 'active' : ''} onClick={() => this.setState({ hidePiano: !this.state.hidePiano })}>Piano</li>
-                        <li className={!this.state.hideScore ? 'active' : ''} onClick={() => this.setState({ hideScore: !this.state.hideScore })}>Score</li>
-                        <li className={!this.state.hideCircle ? 'active' : ''} onClick={() => this.setState({ hideCircle: !this.state.hideCircle })}>Circle</li>
                     </ul>
                     <h2>Help</h2>
                     This tool visualizes the connection between musical chords and scales. The colors have the following meanings:

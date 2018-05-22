@@ -1,11 +1,8 @@
 
 import React from 'react';
-import {
-    parallelSymbols,
-    symbolClasses
-} from './Chroma';
+import { parallelSymbols, symbolClasses } from './Chroma';
+import { symbolName } from './Symbols';
 
-import { symbolName } from './Symbols'
 
 export default class Material extends React.Component {
 
@@ -14,7 +11,8 @@ export default class Material extends React.Component {
             const data = {
                 [type]: item.symbol,
                 [type === 'scale' ? 'chord' : 'scale']: null,
-                tonic: item.root
+                tonic: item.root,
+                order: null
             };
             return (<li key={index}
                 className={symbolClasses(type, item.symbol, props, props.tonic !== item.root)}

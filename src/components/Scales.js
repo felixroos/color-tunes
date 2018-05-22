@@ -1,10 +1,8 @@
 import React from 'react';
-import {
-    symbolClasses
-} from './Chroma';
 import * as Scale from 'tonal-scale';
+import { symbolClasses } from './Chroma';
+import { scaleNames, symbolName } from './Symbols';
 
-import { symbolName, scaleNames } from './Symbols'
 
 export default class Scales extends React.Component {
     render() {
@@ -24,7 +22,7 @@ export default class Scales extends React.Component {
         }, []).map(group =>
             group.map((scale, index) => (
                 (<li key={index} className={symbolClasses('scale', scale, props)}
-                    onClick={() => this.props.onClick({ chord: null, scale })}
+                    onClick={() => this.props.onClick({ chord: null, scale, order: null })}
                     onMouseEnter={() => this.props.onMouseEnter(Object.assign(props, { chord: null, scale }))}
                     onMouseLeave={() => this.props.onMouseLeave(Object.assign(props, { chord: null, scale }))}>
                     {symbolName('scale', scale)}

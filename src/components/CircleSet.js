@@ -22,7 +22,6 @@ export function circleIndex(index, fourths, flip) {
 
 // check https://codepen.io/n0o0/pen/BpdzOZ
 export class CircleSet extends React.Component {
-    history = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
 
     constructor(props) {
         super();
@@ -39,42 +38,68 @@ export class CircleSet extends React.Component {
         /* this.setState({ interval: null }) */
     }
 
-    startAnimation(animation) {
-        if (!animation) {
-            return;
-        }
-        animation.beginElement();
-    }
-
-    getPoints(chroma, size, offset, clinch, order) {
+    getPoints(chroma, size, offset, clinch, close, fill, order) {
 
         const center = size / 2;
         const strokeWidth = size * 0.1;
         const radius = size / 2 - strokeWidth / 2;
         const radians = 2 * Math.PI / 12;
+        let points;
+
         if (order && this.props.ordered) {
-            return order.reduce((points, i) => {
+            points = order.reduce((points, i) => {
                 const index = circleIndex(i, !this.props.chromatic, this.props.flip);
                 points.push(Math.round(center + radius * Math.cos((offset + index - 3) * radians) * clinch));
                 points.push(Math.round(center + radius * Math.sin((offset + index - 3) * radians) * clinch));
                 return points;
             }, []);
+        } else {
+            points = chroma.split('').reduce((points, v, i) => {
+                const index = circleIndex(i, !this.props.chromatic, this.props.flip);
+                const value = chroma.split('')[index];
+                if (value === '1') {
+                    points.push(Math.round(center + radius * Math.cos((offset + i - 3) * radians) * clinch));
+                    points.push(Math.round(center + radius * Math.sin((offset + i - 3) * radians) * clinch));
+                }
+                return points;
+            }, []);
         }
-
-        return chroma.split('').reduce((points, v, i) => {
-            const index = circleIndex(i, !this.props.chromatic, this.props.flip);
-            const value = chroma.split('')[index];
-            if (value === '1') {
-                points.push(Math.round(center + radius * Math.cos((offset + i - 3) * radians) * clinch));
-                points.push(Math.round(center + radius * Math.sin((offset + i - 3) * radians) * clinch));
+        if (close) {
+            // connect end to start
+            points.push(points[0]);
+            points.push(points[1]);
+        }
+        if (fill) {
+            const fill = (24 - points.length) / 2;
+            for (let p = 0; p < fill; ++p) {
+                points = points.concat([points[0], points[1]]);
             }
-            return points;
-        }, []);
+        }
+        return points;
+    }
+
+    getPath(points, interconnected, prependEach) {
+        return points.reduce((path, point, index) => {
+            if (index === 0) {
+                path += 'M';
+            }
+            else if (index % 2 === 0) {
+                if (prependEach) {
+                    path += prependEach + ' '
+                }
+                path += 'L';
+            }
+            path += point + ' ';
+
+            if (interconnected && index > 0 && index % 2 !== 0) {
+                path += this.getPath(points, false, `M${points[index - 1]} ${point}`)
+            }
+            return path;
+        }, '')
     }
 
 
     render() {
-        const animated = this.props.animated !== undefined ? this.props.animate : true;
         let size = this.props.size || 300;
         if (typeof size === 'string') {
             size = size.replace('px', '')
@@ -99,18 +124,11 @@ export class CircleSet extends React.Component {
             return a[circleIndex(i, !this.props.chromatic, this.props.flip)];
         });
 
+
         const clinch = 0.8;
 
-        let points = this.getPoints(chroma, size, offset, clinch, order);
-
-        points.push(points[0]);
-        points.push(points[1]);
-
-        const fill = (24 - points.length) / 2;
-        for (let p = 0; p < fill; ++p) {
-            points = points.concat([points[0], points[1]]);
-        }
-        this.history.unshift(points);
+        let points = this.getPoints(chroma, size, offset, clinch, false, true, order, );
+        let bgPoints = this.getPoints(chroma, size, offset, clinch, true, true);
 
         // render note labels
         const fontsize = size / 12;
@@ -127,7 +145,7 @@ export class CircleSet extends React.Component {
             .map((note, i) => {
                 const x = center + radius * Math.cos((offset + i - 3) * radians) * fontclinch - fontsize / 3;
                 const y = center + radius * Math.sin((offset + i - 3) * radians) * fontclinch + fontsize / 3;
-                const color = stepColor(i, this.props.flip);
+                // const color = stepColor(i, this.props.flip);
                 let match;
                 if (this.props.notes) {
                     match = this.props.notes.find(n => Note.chroma(n) === Note.chroma(note));
@@ -135,8 +153,8 @@ export class CircleSet extends React.Component {
                 }
                 return (
                     <text x={x} y={y} onClick={(e) => handleClick(e, note)} className={!match ? 'active' : ''}
-                        fontFamily="Verdana" fontSize={fontsize} key={i} fill={color} onMouseOver={(e) => this.enter(e)}
-                        onMouseOut={(e) => this.leave(e)}>
+                        fontFamily="Verdana" fontSize={fontsize} key={i} onMouseOver={(e) => this.enter(e)}
+                        onMouseOut={(e) => this.leave(e)}> {/** fill={color} */}
                         {note}
                     </text>)
             });
@@ -173,11 +191,7 @@ export class CircleSet extends React.Component {
             }];
             line = <line x1={vec[0].x} y1={vec[0].y} x2={vec[1].x} y2={vec[1].y} style={{ stroke: 'black', strokeWidth: 2 }} />;
         }
-        let animation = '';
-        if (animated && this.history.length > 1) {
-            animation = <animate fill="freeze" key={this.history.length} ref={(animation) => { this.startAnimation(animation) }} attributeName="points" dur="200ms" from={this.history[1].join(' ')} to={this.history[0].join(' ')} />
-            /* this.animations.push(animation); */
-        }
+
         let skeletons = '';
 
         /* if (this.props.skeletons) {
@@ -186,16 +200,12 @@ export class CircleSet extends React.Component {
                 return (<polygon key={index} className="skeleton" points={points.join(' ')} fill="transparent" />)
             });
         } */
-        const path = this.history[0].reduce((path, point, index) => {
-            if (index === 0) {
-                path += 'M';
-            }
-            else if (index % 2 === 0) {
-                path += 'L';
-            }
-            path += point + ' ';
-            return path;
-        }, '')
+
+        const interconnectedPath = this.getPath(points, true);
+        const orderedPath = this.getPath(points);
+
+        const bgPath = this.getPath(bgPoints);
+
         return (
             <div>
                 <svg
@@ -205,10 +215,12 @@ export class CircleSet extends React.Component {
                     viewBox={`0 0 ${this.props.size} ${this.props.size}`}
                 >
                     <polygon className="background" points={positions.join(' ')} />
-                    {/* <polygon className="shape" points={(animated ? this.history[1] : this.history[0]).join(' ')} fill={color} strokeWidth="2">
-                        {animation}
-                    </polygon> */}
-                    <path className="shape" d={path} stroke={color} fill={bgColor} strokeWidth="3">
+
+                    <path d={bgPath} stroke={color} strokeWidth="0" fill={bgColor}> {/* <!-- fill="none"  --> */}
+                    </path>
+                    <path className="interconnections" d={interconnectedPath} stroke={color} strokeWidth="3" fill="none">
+                    </path>
+                    <path className="ordered" d={orderedPath} stroke={color} strokeWidth="3" fill="none">
                     </path>
                     <circle className="tonic" cx={tonicPosition.x} cy={tonicPosition.y} r={5} fill={color} />
                     {skeletons}

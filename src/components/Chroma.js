@@ -1,12 +1,13 @@
 
+import { transpose } from 'tonal';
+import * as TonalArray from 'tonal-array';
 import * as Chord from 'tonal-chord';
+import * as Distance from 'tonal-distance';
 import * as Note from 'tonal-note';
 import * as PcSet from 'tonal-pcset';
-import * as Distance from 'tonal-distance';
 import * as Scale from 'tonal-scale';
-import { transpose } from 'tonal';
+import { chordNames, scaleNames, symbolName } from './Symbols';
 
-import { symbolName, scaleNames, chordNames } from './Symbols';
 
 const chromatics = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 export function removeOctaves(notes) {
@@ -163,6 +164,15 @@ export function getProps(state) {
         subsets = getSubsets(state.chord, false, state.group);
         supersets = getSupersets(state.chord, false, state.group);
     }
+    if (state.rotate) {
+        scorenotes = TonalArray.rotate(state.rotate, scorenotes);
+    }
+    if (state.order) {
+        notes = state.order.map(i => notes[i]);
+        scorenotes = state.order.map(i => scorenotes[i]);
+    }
+
+
     const parallels = chromaParallels(chroma, state.group);
     return {
         chord: state.chord, scale: state.scale, tonic, notes, chroma, intervals, scorenotes, label, subsets, supersets, parallels

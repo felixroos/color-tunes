@@ -10,19 +10,24 @@
     fill: #fff;
 }
 
-.Circle .tonic {
-    /* fill: #58ad3e; */
-}
-
-.Circle polygon, .Circle path {
+.Circle polygon, .Circle path.shape, .Circle .tonic, .Circle text {
     transition: all .2s linear;
 }
 
-.Circle .shape {
-    /* fill: #d7ffc1;
-    stroke: #58ad3e; */
-    /* opacity: 0.5; */
+.Circle path.interconnections {
+    opacity: 0.1;
 }
+
+.Circle path.ordered {
+    transition: all .2s linear;
+}
+
+/* 
+@keyframes dashdraw {
+    to {
+        stroke-dashoffset: 40
+    }
+} */
 
 .Circle text {
     fill: #3a3a3a

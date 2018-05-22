@@ -28,6 +28,8 @@ export default class Explorer extends React.Component {
             extended: true,
             flip: false,
             ordered: true,
+            rotate: 0,
+            order: undefined,
             items: [],
             group
         };
@@ -49,6 +51,12 @@ export default class Explorer extends React.Component {
                 .filter(i => i.root !== item.root && i.symbol !== item.symbol)
         }) */
         this.setState({ items: [] });
+    }
+
+    shuffle(notes) {
+        this.setState({
+            order: notes.map((n, i) => i).sort(() => 1 - 2 * Math.random())
+        })
     }
 
     render() {
@@ -142,7 +150,17 @@ export default class Explorer extends React.Component {
                     {label}
                     {!this.state.hidePiano ? piano : ''}
                     {!this.state.hideScore ? score : ''}
+
                     {!this.state.hideCircle ? circle : ''}
+
+                    <ul className="action-buttons">
+                        <li>
+                            <a onClick={() => this.setState({ rotate: (this.state.rotate + 1) % props.notes.length })}>ROTATE</a>
+                        </li>
+                        <li>
+                            <a onClick={() => this.shuffle(props.notes)}>SHUFFLE</a>
+                        </li>
+                    </ul>
                     {views}
                     <h2>Settings</h2>
                     <h5>Views</h5>

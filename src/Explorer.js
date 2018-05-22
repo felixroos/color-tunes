@@ -160,6 +160,9 @@ export default class Explorer extends React.Component {
                         <li>
                             <a onClick={() => this.shuffle(props.notes)}>SHUFFLE</a>
                         </li>
+                        <li>
+                            <a onClick={() => this.setState({ order: null, rotate: 0 })}>CLEAR</a>
+                        </li>
                     </ul>
                     {views}
                     <h2>Settings</h2>

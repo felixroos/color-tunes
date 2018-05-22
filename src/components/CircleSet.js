@@ -127,7 +127,7 @@ export class CircleSet extends React.Component {
 
         const clinch = 0.8;
 
-        let points = this.getPoints(chroma, size, offset, clinch, false, true, order, );
+        let points = this.getPoints(chroma, size, offset, clinch, true, true, order, );
         let bgPoints = this.getPoints(chroma, size, offset, clinch, true, true);
 
         // render note labels

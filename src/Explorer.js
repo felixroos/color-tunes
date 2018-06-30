@@ -11,6 +11,7 @@ import PianoKeyboard from './components/PianoKeyboard';
 import Scales from './components/Scales';
 import Score from './components/Score';
 import { groupNames, randomChord, randomItem, randomScale } from './components/Symbols';
+import { sounds } from './assets/sounds/sounds.js';
 
 export default class Explorer extends React.Component {
     chromatics = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
@@ -63,6 +64,31 @@ export default class Explorer extends React.Component {
         const simple = Note.simplify(note);
         const newTonic = this.state.tonic !== simple ? simple : Note.enharmonic(simple);
         this.setState({ tonic: newTonic });
+    }
+
+    randomChordOrScale(keepTonic = false, type) {
+        const isChord = type === 'chord' ? true : (type === 'scale' ? false : Math.random() > 0.5);
+        const group = this.state.group || 'Advanced';
+        this.setState({
+            tonic: keepTonic ? this.state.tonic : randomItem(this.chromatics),
+            scale: !isChord ? randomScale(group) : null,
+            chord: isChord ? randomChord(group) : null,
+            order: null, rotate: 0
+        });
+        if (isChord) {
+            setTimeout(() => {
+                this.listen();
+            })
+        }
+    };
+
+    listen() {
+        getProps(this.state).notes.forEach(note => {
+            const index = Note.chroma(note) + 36;
+            var audio = new Audio(sounds[index - 16]);
+            audio.play();
+            /* console.warn('Audio is currently not available'); */
+        });
     }
 
     render() {
@@ -169,6 +195,15 @@ export default class Explorer extends React.Component {
                         </li>
                         <li>
                             <a onClick={() => this.setState({ order: null, rotate: 0 })}>CLEAR</a>
+                        </li>
+                        <li>
+                            <a onClick={() => this.randomChordOrScale(true, 'chord')}>% CHORD</a>
+                        </li>
+                        <li>
+                            <a onClick={() => this.randomChordOrScale(true, 'scale')}>% SCALE</a>
+                        </li>
+                        <li>
+                            <a onClick={() => this.listen(props.notes)}>LISTEN</a>
                         </li>
                     </ul>
                     {views}

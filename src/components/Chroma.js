@@ -171,12 +171,18 @@ export function getProps(state) {
         notes = state.order.map(i => notes[i]);
         scorenotes = state.order.map(i => scorenotes[i]);
     }
-
+    const labels = getChromaticLabels(notes);
 
     const parallels = chromaParallels(chroma, state.group);
     return {
-        chord: state.chord, scale: state.scale, tonic, notes, chroma, intervals, scorenotes, label, subsets, supersets, parallels
+        chord: state.chord, scale: state.scale, tonic, notes, chroma, intervals, scorenotes, label, subsets, supersets, parallels, labels
     };
+}
+
+export function getChromaticLabels(notes) {
+    return chromatics.map(note => {
+        return notes.find(n => Note.chroma(n) === Note.chroma(note)) || note;
+    });
 }
 
 export function symbolClasses(type, symbol, props, differentRoot) {

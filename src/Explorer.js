@@ -59,21 +59,28 @@ export default class Explorer extends React.Component {
         })
     }
 
+    newTonic(note) {
+        const simple = Note.simplify(note);
+        const newTonic = this.state.tonic !== simple ? simple : Note.enharmonic(simple);
+        this.setState({ tonic: newTonic });
+    }
+
     render() {
         let piano, circle, label, score = '';
         const props = getProps(this.state);
         label = <h2>{props.label}</h2>;
-        const skeletons = this.state.items.map(item => getProps(item).chroma);
+        // const skeletons = this.state.items.map(item => getProps(item).chroma);
+        // skeletons={skeletons}
+        const order = props.notes.map(note => Note.props(note).chroma);
 
         circle = (<CircleSet
             size="350"
             chroma={props.chroma}
-            notes={props.notes}
+            order={order}
             ordered={this.state.ordered}
-            skeletons={skeletons}
-            onClick={(note) => this.setState({ tonic: note })}
-            tonic={props.tonic}
-            labels={this.chromatics}
+            onClick={(note) => this.newTonic(note)}
+            origin={props.tonic}
+            labels={props.labels}
             flip={this.state.circle === 'fifths'}
             chromatic={this.state.circle === 'chromatics'}
         />);

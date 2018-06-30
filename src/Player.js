@@ -7,6 +7,7 @@ import { sounds } from './assets/sounds/sounds.js';
 import { getTonalChord } from './chordScales';
 /* import Score from './components/Score'; */
 import { CircleSet } from './components/CircleSet';
+import { getChromaticLabels } from './components/Chroma';
 import PianoKeyboard from './components/PianoKeyboard';
 
 /* const center = pc =>
@@ -61,12 +62,13 @@ export default class Player extends React.Component {
     const chord = this.props.chord || this.state.chord;
     if (chord) {
       const notes = Chord.notes(getTonalChord(chord));
-      
+
       /* const intervals = Chord.intervals(getTonalChord(chord)); */
       const tokens = Chord.tokenize(getTonalChord(chord));
       const tonic = Note.pc(tokens[0]);
       // const scorenotes = intervals.map(transpose(center(tonic)));
       const chroma = PcSet.chroma(notes);
+      const labels = getChromaticLabels(notes);
 
       piano = (<PianoKeyboard
         width="100%"
@@ -79,8 +81,8 @@ export default class Player extends React.Component {
       circle = (<CircleSet
         chroma={chroma}
         ordered={true}
-        tonic={tonic}
-        notes={notes}
+        origin={tonic}
+        labels={labels}
         size="350"
         flip={this.state.circle === 'fifths'}
         chromatic={this.state.circle === 'chromatics'}

@@ -10,7 +10,7 @@
     fill: #fff;
 }
 
-.Circle polygon, .Circle path.shape, .Circle .tonic, .Circle text {
+.Circle polygon, .Circle path.shape, .Circle .origin, .Circle text {
     transition: all .2s linear;
 }
 

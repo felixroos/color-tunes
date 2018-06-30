@@ -1,7 +1,6 @@
 
 // ripped from https://github.com/danigb/tonal-app/blob/master/src/components/viz/CircleSet.js
 import React from "react";
-import * as Note from 'tonal-note';
 import "./CircleSet.css";
 import { stepColor } from './Colorizer';
 
@@ -26,40 +25,35 @@ export class CircleSet extends React.Component {
     constructor(props) {
         super();
         this.state = {
-            interval: null
+            line: null
         }
     }
 
-    enter(e) {
-        /* this.setState({ interval: [this.props.tonic, e.target.innerHTML] }); */
-    }
-
-    leave(e) {
-        /* this.setState({ interval: null }) */
-    }
-
-    getPoints(chroma, size, offset, clinch, close, fill, order) {
-
+    getPoint(index, size = 350, offset = 0, clinch = 0.8, outset = 0) {
         const center = size / 2;
         const strokeWidth = size * 0.1;
         const radius = size / 2 - strokeWidth / 2;
         const radians = 2 * Math.PI / 12;
-        let points;
+        return [
+            (Math.round(center + radius * Math.cos((offset + index - 3) * radians) * clinch - outset)),
+            (Math.round(center + radius * Math.sin((offset + index - 3) * radians) * clinch + outset))
+        ]
+    }
 
+    getPoints(chroma, size, offset, clinch, close, fill, order) {
+        let points;
         if (order && this.props.ordered) {
             points = order.reduce((points, i) => {
                 const index = circleIndex(i, !this.props.chromatic, this.props.flip);
-                points.push(Math.round(center + radius * Math.cos((offset + index - 3) * radians) * clinch));
-                points.push(Math.round(center + radius * Math.sin((offset + index - 3) * radians) * clinch));
-                return points;
+                return points.concat(this.getPoint(index, size, offset, clinch));
             }, []);
         } else {
             points = chroma.split('').reduce((points, v, i) => {
                 const index = circleIndex(i, !this.props.chromatic, this.props.flip);
                 const value = chroma.split('')[index];
+
                 if (value === '1') {
-                    points.push(Math.round(center + radius * Math.cos((offset + i - 3) * radians) * clinch));
-                    points.push(Math.round(center + radius * Math.sin((offset + i - 3) * radians) * clinch));
+                    return points.concat(this.getPoint(i, size, offset, clinch));
                 }
                 return points;
             }, []);
@@ -104,106 +98,67 @@ export class CircleSet extends React.Component {
         if (typeof size === 'string') {
             size = size.replace('px', '')
         }
-
-        let order = this.props.notes ?
-            this.props.notes
-                /* .map(note => Note.chroma(note)) */
-                .map(note => Note.props(note).chroma)
-            : null;
         size = parseInt(size, 10);
-        const center = size / 2;
-        const strokeWidth = size * 0.1;
-        const radius = size / 2 - strokeWidth / 2;
+        const clinch = 0.8;
         let chroma = this.props.chroma || '0';
-        // const circumference = 2 * Math.PI * radius;
-        const radians = 2 * Math.PI / 12;
         let offset = this.props.offset || 0;
-        let notes = this.props.labels || ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
-
-        notes = notes.map((p, i, a) => {
+        let labels = this.props.labels || [];
+        labels = labels.map((p, i, a) => {
             return a[circleIndex(i, !this.props.chromatic, this.props.flip)];
         });
 
-
-        const clinch = 0.8;
-
-        let points = this.getPoints(chroma, size, offset, clinch, true, true, order, );
+        let points = this.getPoints(chroma, size, offset, clinch, true, true, this.props.order);
         let bgPoints = this.getPoints(chroma, size, offset, clinch, true, true);
+        let positions = this.getPoints(new Array(12).fill(1).join(''), size, offset, clinch);
 
-        // render note labels
+        // render labels
         const fontsize = size / 12;
         const fontclinch = 0.9;
 
-        const positions = [];
-        notes.forEach((note, i) => {
-            positions.push(center + radius * Math.cos((offset + i - 3) * radians) * clinch);
-            positions.push(center + radius * Math.sin((offset + i - 3) * radians) * clinch);
-        });
-
-
-        const labels = notes
-            .map((note, i) => {
-                const x = center + radius * Math.cos((offset + i - 3) * radians) * fontclinch - fontsize / 3;
-                const y = center + radius * Math.sin((offset + i - 3) * radians) * fontclinch + fontsize / 3;
-                // const color = stepColor(i, this.props.flip);
-                let match;
-                if (this.props.notes) {
-                    match = this.props.notes.find(n => Note.chroma(n) === Note.chroma(note));
-                    note = match || note;
-                }
+        const labelNodes = labels
+            .map((label, i) => {
+                const pos = this.getPoint(i, size, offset, fontclinch, fontsize / 3);
+                const active = (this.props.order || []).indexOf(circleIndex(i, !this.props.chromatic, this.props.flip)) === -1;
                 return (
-                    <text x={x} y={y} onClick={(e) => handleClick(e, note)} className={!match ? 'active' : ''}
-                        fontFamily="Verdana" fontSize={fontsize} key={i} onMouseOver={(e) => this.enter(e)}
-                        onMouseOut={(e) => this.leave(e)}> {/** fill={color} */}
-                        {note}
+                    <text x={pos[0]} y={pos[1]} onClick={(e) => handleClick(e, label)} className={active ? 'active' : ''}
+                        fontFamily="Verdana" fontSize={fontsize} key={i} > {/** fill={color} */}
+                        {label}
                     </text>)
             });
         const classNames = 'Circle ' + this.props.type;
-        // find out position of tonic circle
-        const tonicIndex = circleIndex(Note.props(this.props.tonic).chroma, !this.props.chromatic, this.props.flip);
-
-        const tonicPosition = {
-            x: center + radius * Math.cos((offset + tonicIndex - 3) * radians) * clinch,
-            y: center + radius * Math.sin((offset + tonicIndex - 3) * radians) * clinch
+        const originIndex = labels.indexOf(this.props.origin);
+        const dot = this.getPoint(originIndex, size, offset, clinch);
+        const dotPosition = {
+            x: dot[0],
+            y: dot[1]
         }
-
-        const handleClick = (e, note) => {
+        const handleClick = (e, label) => {
             if (!this.props.onClick) {
                 return;
             }
             e.preventDefault();
-            const simple = Note.simplify(note);
-            const newTonic = this.props.tonic !== simple ? simple : Note.enharmonic(simple);
-            this.props.onClick(newTonic);
+            this.props.onClick(label);
         };
-        const color = stepColor(tonicIndex, this.props.flip);
-        const bgColor = stepColor(tonicIndex, this.props.flip, 80);
+        const color = stepColor(originIndex, this.props.flip);
+        const bgColor = stepColor(originIndex, this.props.flip, 80);
         // hover line?
         let line = ''
-        if (this.state.interval && this.state.interval.length === 2) {
-            const indices = [notes.indexOf(this.state.interval[0]), notes.indexOf(this.state.interval[1])];
+        // this.state.line = this.props.order.slice(0, 2).map(i => this.props.labels[i]);
+        if (this.state.line && this.state.line.length === 2) {
+            const indices = [labels.indexOf(this.state.line[0]), labels.indexOf(this.state.line[1])];
+            const points = [this.getPoint(indices[0], size, offset, clinch), this.getPoint(indices[1], size, offset, clinch)];
             const vec = [{
-                x: center + radius * Math.cos((offset + indices[0] - 3) * radians) * clinch,
-                y: center + radius * Math.sin((offset + indices[0] - 3) * radians) * clinch
+                x: points[0][0],
+                y: points[0][1]
             }, {
-                x: center + radius * Math.cos((offset + indices[1] - 3) * radians) * clinch,
-                y: center + radius * Math.sin((offset + indices[1] - 3) * radians) * clinch
+                x: points[1][0],
+                y: points[1][1]
             }];
             line = <line x1={vec[0].x} y1={vec[0].y} x2={vec[1].x} y2={vec[1].y} style={{ stroke: 'black', strokeWidth: 2 }} />;
         }
 
-        let skeletons = '';
-
-        /* if (this.props.skeletons) {
-            skeletons = this.props.skeletons.map((skeleton, index) => {
-                const points = this.getPoints(skeleton, size, offset, clinch, this.state.flip);
-                return (<polygon key={index} className="skeleton" points={points.join(' ')} fill="transparent" />)
-            });
-        } */
-
         const interconnectedPath = this.getPath(points, true);
         const orderedPath = this.getPath(points);
-
         const bgPath = this.getPath(bgPoints);
 
         return (
@@ -215,18 +170,16 @@ export class CircleSet extends React.Component {
                     viewBox={`0 0 ${this.props.size} ${this.props.size}`}
                 >
                     <polygon className="background" points={positions.join(' ')} />
-
                     <path d={bgPath} stroke={color} strokeWidth="0" fill={bgColor}> {/* <!-- fill="none"  --> */}
                     </path>
                     <path className="interconnections" d={interconnectedPath} stroke={color} strokeWidth="3" fill="none">
                     </path>
                     <path className="ordered" d={orderedPath} stroke={color} strokeWidth="3" fill="none">
                     </path>
-                    <circle className="tonic" cx={tonicPosition.x} cy={tonicPosition.y} r={5} fill={color} />
-                    {skeletons}
+                    <circle className="origin" cx={dotPosition.x} cy={dotPosition.y} r={5} fill={color} />
                     {line}
                     {this.props.line}
-                    {labels}
+                    {labelNodes}
                 </svg>
             </div >
         );

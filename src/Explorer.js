@@ -35,6 +35,7 @@ export default class Explorer extends React.Component {
             ordered: true,
             fixedTonic: true,
             fixedOctave: false,
+            tonicFirst: true,
             rotate: 0,
             order: undefined,
             autoplay: true,
@@ -62,10 +63,13 @@ export default class Explorer extends React.Component {
         this.setState({ items: [] });
     }
 
-    shuffle(notes) {
-        this.setState({
-            order: notes.map((n, i) => i).sort(() => 1 - 2 * Math.random())
-        });
+    shuffle(notes, tonicFirst = this.state.tonicFirst) {
+        const order = notes.map((n, i) => i).sort(() => 1 - 2 * Math.random());
+        if (tonicFirst) {
+            order[order.indexOf(0)] = order[0];
+            order[0] = 0;
+        }
+        this.setState({ order });
         this.autoplay();
     }
 
@@ -335,6 +339,7 @@ export default class Explorer extends React.Component {
                         <li className={this.state.autoplay ? 'active' : ''} onClick={() => this.setState({ autoplay: !this.state.autoplay })}>Autoplay</li>
                         <li className={this.state.fixedTonic ? 'active' : ''} onClick={() => this.setState({ fixedTonic: !this.state.fixedTonic })}>fixedTonic</li>
                         <li className={this.state.fixedOctave ? 'active' : ''} onClick={() => this.setState({ fixedOctave: !this.state.fixedOctave })}>fixedOctave</li>
+                        <li className={this.state.tonicFirst ? 'active' : ''} onClick={() => this.setState({ tonicFirst: !this.state.tonicFirst })}>tonicFirst</li>
                     </ul>
                     <h2>Help</h2>
                     This tool visualizes the connection between musical chords and scales. The colors have the following meanings:

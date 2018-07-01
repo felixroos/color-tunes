@@ -41,12 +41,6 @@ ul {
     width: 100%;
 }
 
-.score {
-    width: 100%;
-    text-align: center;
-    position: relative;
-}
-
 h5 {
     margin: 0;
 }
@@ -83,6 +77,13 @@ li.parallel {
 
 canvas, .Piano {
     width: 100%;
-    max-width: 500px;
+    max-width: 900px;
     margin: 0 auto;
+}
+
+.score {
+    width: 100%;
+    margin: auto;
+    max-width: 500px;
+    position: relative;
 }

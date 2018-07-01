@@ -6,47 +6,51 @@ import { circleIndex } from "./CircleSet";
 import { stepColor } from './Colorizer';
 import "./PianoKeyboard.css";
 
+const scale = 0.5;
 const WHITES = [0, 2, 4, 5, 7, 9, 11];
 const BLACKS = [1, 3, 6, 8, 10];
 const BPOS = [1, 2, 4, 5, 6];
-const WHITE_WIDTH = 40;
-const WHITE_HEIGHT = 150;
-const BLACK_WIDTH = 22;
-const BLACK_HEIGHT = 90;
+const WHITE_WIDTH = 40 * scale;
+const WHITE_HEIGHT = 150 * scale;
+const BLACK_WIDTH = 22 * scale;
+const BLACK_HEIGHT = 90 * scale;
 
-const getKeyTypes = (type, midi, pcset, notes) => {
+const getKeyTypes = (type, midi, pcset, scorenotes) => {
     const chroma = midi % 12;
+    const active = () => !!scorenotes.find(note => Note.props(note).midi === midi);
     return cat([
         "piano-key",
         type,
         {
-            active: pcset.chroma[chroma] === "1" || notes.names[midi] !== undefined,
-            tonic: pcset.tonic === chroma || notes.tonic === midi
+            active: active(),
+            tonic: active() && pcset.tonic === chroma,
+            chroma: pcset.chroma[chroma] === "1",
+            'chroma-tonic': pcset.tonic === chroma
         }
     ]);
 };
 
-const Key = ({ type, chroma, i, oct, pcset, notes, x, onClick }) => {
+const Key = ({ type, chroma, i, oct, pcset, scorenotes, x, onClick }) => {
     const isWhite = type === "white";
-    const midi = (oct + 1) * 12 + chroma;
-    const offset = isWhite
+    const midi = (oct) * 12 + chroma;
+    const offset = (isWhite
         ? i * WHITE_WIDTH
-        : WHITE_WIDTH * BPOS[i] - BLACK_WIDTH / 2;
+        : WHITE_WIDTH * BPOS[i] - BLACK_WIDTH / 2)
 
     const handleClick = e => {
         e.preventDefault();
-        onClick(midi, notes.names[midi]);
+        onClick(midi);
     };
+    const keyClass = `note-${midi} ${getKeyTypes(type, midi, pcset, scorenotes)}`;
 
     return (
         <rect
             key={"note-" + midi}
             id={"note-" + midi}
-            className={getKeyTypes(type, midi, pcset, notes)}
+            className={keyClass}
             width={isWhite ? WHITE_WIDTH : BLACK_WIDTH}
             height={isWhite ? WHITE_HEIGHT : BLACK_HEIGHT}
             x={x + offset}
-            name={notes.names[midi]}
             onClick={handleClick}
         />
     );
@@ -72,21 +76,19 @@ export default ({
     width,
     tonic,
     notes,
+    scorenotes,
     onClick,
-    minOct = 3,
-    maxOct = 6
+    minOct = 1,
+    maxOct = 9
 }) => {
     const pcset = { tonic: setTonic, chroma: setChroma || "" };
-    const newnotes = {
-        tonic: tonic,
-        names: (notes || []).reduce((index, note) => {
-            index[Note.midi(note)] = note;
-            return index;
-        }, {})
-    };
+
+    const leftKeyCut = 5;
+    const rightKeyCut = 6;
     const octs = Array.range(minOct, maxOct);
     // const viewWidth = 1120
-    const viewWidth = octs.length * 7 * WHITE_WIDTH;
+    const viewWidth = octs.length * 7 * WHITE_WIDTH - ((leftKeyCut + rightKeyCut) * WHITE_WIDTH);
+
     width = width || "100%";
 
     const index = circleIndex(setTonic, true);
@@ -110,12 +112,11 @@ export default ({
         fill: ${color};
       }
     `;
-
     return (
         <div className={"Piano " + className}>
             <style>{style}</style>
             <svg
-                width={width}
+                width={viewWidth}
                 viewBox={`0 0 ${viewWidth} ${WHITE_HEIGHT}`}
                 version="1.1"
                 xmlns="http://www.w3.org/2000/svg"
@@ -125,9 +126,9 @@ export default ({
                         <Octave
                             key={"oct-" + o}
                             oct={o}
-                            x={i * 7 * WHITE_WIDTH}
+                            x={i * 7 * WHITE_WIDTH - (5 * WHITE_WIDTH)}
                             pcset={pcset}
-                            notes={newnotes}
+                            scorenotes={scorenotes}
                             onClick={onClick || (() => { })}
                         />
                     ))}

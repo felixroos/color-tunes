@@ -1,3 +1,7 @@
+.Piano {
+  overflow: auto;
+}
+
 .piano-key {
   stroke: #3b3636;
   fill: #fff;
@@ -8,6 +12,10 @@
 .piano-key.black {
   stroke: #3b3636;
   fill: #000;
+}
+
+.note-12, .note-13, .note-14, .note-15, .note-16, .note-17, .note-18, .note-19, .note-20, .note-109 {
+  display: none;
 }
 
 /* .piano-key.active {

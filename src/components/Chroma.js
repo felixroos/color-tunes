@@ -131,8 +131,8 @@ export function parallelSymbols(type, parallel, props) {
 }
 
 
-export const center = pc =>
-    pc ? (pc[0] === "A" || pc[0] === "B" ? pc + 3 : pc + 4) : null;
+export const center = (pc, octave = 3) => pc ? pc + octave : null
+/* pc ? (pc[0] === "A" || pc[0] === "B" ? pc + octave : pc + parseInt(octave + 1)) : null; */
 
 export function getProps(state) {
     let label;
@@ -149,7 +149,7 @@ export function getProps(state) {
         notes = removeOctaves(Scale.notes(tonic, state.scale));
         chroma = PcSet.chroma(notes);
         intervals = Scale.intervals(state.scale);
-        scorenotes = intervals.map(transpose(center(tonic)));
+        scorenotes = intervals.map(transpose(center(tonic, state.octave)));
         label = tonic + ' ' + symbolName('scale', state.scale);
         subsets = getSubsets(state.scale, true, state.group);
         supersets = getSupersets(state.scale, true, state.group);
@@ -157,8 +157,8 @@ export function getProps(state) {
         const chord = tonic + state.chord;
         // TODO: bug resport: 4 and 5 chords (possibly more) do not omit the octave after the notes
         notes = removeOctaves(Chord.notes(chord));
-        const intervals = Chord.intervals(chord);
-        scorenotes = intervals.map(transpose(center(tonic)));
+        const intervals = Chord.intervals(chord).map(i => i.replace('13', '6'));
+        scorenotes = intervals.map(transpose(center(tonic, state.octave)));
         chroma = chordChroma(state.tonic, state.chord);
         label = tonic + symbolName('chord', state.chord);
         subsets = getSubsets(state.chord, false, state.group);

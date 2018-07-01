@@ -34,7 +34,12 @@ class Score extends PureComponent {
             renderer.resize(W, H);
             ctx.clearRect(0, 0, W, H);
             var stave = new Vex.Flow.Stave(0, 0, W - 5);
-            stave.addClef("treble").setContext(ctx);
+
+            const clef = !!this.props.notes.map(n => Note.props(n).midi).find(m => m < 53)
+                ? 'bass'
+                : 'treble';
+
+            stave.addClef(clef).setContext(ctx);
             if (this.props.keyTonic) stave.addKeySignature(this.props.keyTonic);
 
             stave.draw();
@@ -44,10 +49,10 @@ class Score extends PureComponent {
                 stave,
                 this.props.notes.map(function (n) {
                     const { letter, acc, oct } = Note.props(n);
-
                     const note = new Vex.Flow.StaveNote({
                         keys: [letter + "/" + oct],
-                        duration: "q"
+                        duration: "q",
+                        clef
                     });
                     if (acc) note.addAccidental(0, new Vex.Flow.Accidental(acc));
                     return note;

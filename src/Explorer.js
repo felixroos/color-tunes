@@ -33,7 +33,7 @@ export default class Explorer extends React.Component {
             extended: true,
             flip: false,
             ordered: true,
-            fixedTonic: false,
+            fixedTonic: true,
             fixedOctave: false,
             rotate: 0,
             order: undefined,
@@ -77,19 +77,24 @@ export default class Explorer extends React.Component {
 
     smallestInterval(origin, target) {
         const interval = Distance.interval(origin, target);
-        let up = Interval.semitones(interval) % 12; // BUG: Interval.semitones('0A') is NaN instead of 0
-        let down = Interval.semitones(Interval.invert(interval)) % 12;
-        return up > down ? '-' + Interval.fromSemitones(Math.abs(down)) : Interval.fromSemitones(Math.abs(up));
+        let up = Math.abs(Interval.semitones(interval)) % 12; // BUG: Interval.semitones('0A') is NaN instead of 0
+        let down = Math.abs(Interval.semitones(Interval.invert(interval))) % 12;
+        return up > down ? '-' + Interval.fromSemitones(down) : Interval.fromSemitones(up);
     }
 
-    newTonicState(tonic, fixedOctave = this.state.fixedOctave) {
+    newTonicState(tonic, fixedOctave = this.state.fixedOctave, anchorNote = 'C4', maxAnchorDistance = 12) {
         const smallestInterval = this.smallestInterval(this.state.tonic, tonic);
         let newTonic = Note.simplify(Distance.transpose(this.state.tonic + this.state.octave, smallestInterval));
-
         if (Note.props(newTonic).pc === this.state.tonic) {
             newTonic = Note.enharmonic(newTonic);
         }
-        const octave = !fixedOctave ? Note.props(newTonic).oct : this.state.octave;
+
+        let octave = !fixedOctave ? Note.props(newTonic).oct : this.state.octave;
+        const distanceToAnchor = Interval.semitones(Distance.interval(anchorNote, newTonic));
+        // jump octave down if getting too far away from anchorNote
+        if (Math.abs(distanceToAnchor) > maxAnchorDistance) {
+            octave += distanceToAnchor > 0 ? -1 : 1;
+        }
         const pc = Note.props(newTonic).pc;
         // console.log(`${this.state.tonic}${this.state.octave} > ${tonic} = ${smallestInterval} > ${tonic}${octave}`);
         return { tonic: pc, octave: octave || this.state.octave };
@@ -98,6 +103,23 @@ export default class Explorer extends React.Component {
     newTonic(note) {
         this.setState(this.newTonicState(note));
         this.autoplay();
+    }
+
+    fifthDown() {
+        this.setState(this.newTonicState(Distance.trFifths(this.state.tonic, -1)));
+        this.autoplay(false);
+    }
+
+    randomTonic(maxFifthDistance) {
+        let newTonic;
+        if (!maxFifthDistance) {
+            newTonic = randomItem(this.chromatics);
+        } else {
+            const fifthDistance = (Math.random() > 0.5 ? -1 : 1) * Math.ceil(Math.random() * maxFifthDistance);
+            newTonic = Distance.trFifths(this.state.tonic, fifthDistance);
+        }
+        this.setState(this.newTonicState(newTonic));
+        this.autoplay(false);
     }
 
     randomChordOrScale(keepTonic = false, type) {
@@ -159,7 +181,7 @@ export default class Explorer extends React.Component {
 
 
     listen(harmonic = false) {
-        const bpm = 320;
+        const bpm = 200;
         this.playNotes(getProps(this.state).scorenotes, harmonic ? 0 : 60 / bpm);
     }
 
@@ -279,6 +301,12 @@ export default class Explorer extends React.Component {
                         </li>
                         <li>
                             <a onClick={() => this.randomChordOrScale(this.state.fixedTonic, 'scale')}>% SCALE</a>
+                        </li>
+                        <li>
+                            <a onClick={() => this.randomTonic(2)}>% TONIC</a>
+                        </li>
+                        <li>
+                            <a onClick={() => this.fifthDown()}>-5</a>
                         </li>
                         <li>
                             <a onClick={() => this.listen()}>LISTEN</a>

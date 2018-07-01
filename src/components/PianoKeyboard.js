@@ -17,7 +17,7 @@ const BLACK_HEIGHT = 90 * scale;
 
 const getKeyTypes = (type, midi, pcset, scorenotes) => {
     const chroma = midi % 12;
-    const active = () => !!scorenotes.find(note => Note.props(note).midi === midi);
+    const active = () => scorenotes && !!scorenotes.find(note => Note.props(note).midi === midi);
     return cat([
         "piano-key",
         type,

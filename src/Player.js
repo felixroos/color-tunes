@@ -74,9 +74,6 @@ export default class Player extends React.Component {
         width="100%"
         setTonic={Note.chroma(tokens[0])}
         setChroma={chroma}
-        minOct={1}
-        maxOct={7}
-        notes={notes}
       />);
       circle = (<CircleSet
         chroma={chroma}

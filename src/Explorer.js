@@ -1,20 +1,17 @@
 import React from 'react';
-/* import { sounds } from './assets/sounds/sounds.js'; */
-import * as Note from 'tonal-note';
 import * as Distance from 'tonal-distance';
-import './Explorer.css';
+import * as Note from 'tonal-note';
 import Chords from './components/Chords';
-import { getProps } from './components/Chroma';
-import { CircleSet, circleIndex } from './components/CircleSet';
+import { getProps, newTonicState } from './components/Chroma';
+import { circleIndex, CircleSet } from './components/CircleSet';
 import { stepColor } from './components/Colorizer';
 import Material from './components/Material';
+import Pianist from './components/Pianist';
 import PianoKeyboard from './components/PianoKeyboard';
 import Scales from './components/Scales';
 import Score from './components/Score';
 import { groupNames, randomChord, randomItem, randomScale } from './components/Symbols';
-import { sounds } from './assets/sounds/sounds.js';
-import * as WAAClock from 'waaclock';
-import { Interval } from 'tonal';
+import './Explorer.css';
 
 export default class Explorer extends React.Component {
     chromatics = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
@@ -22,13 +19,15 @@ export default class Explorer extends React.Component {
     constructor() {
         super();
         const isChord = Math.random() > 0.5;
-        const group = 'Advanced';
+        const group = 'Diatonic';
         this.state = {
             circle: 'fourths',
-            tonic: randomItem(this.chromatics),
+            // tonic: randomItem(this.chromatics),
+            tonic: 'C',
             octave: 3,
-            scale: !isChord ? randomScale(group) : null,
-            chord: isChord ? randomChord(group) : null,
+            scale: 'major',
+            //scale: !isChord ? randomScale(group) : null,
+            //chord: isChord ? randomChord(group) : null,
             history: [],
             extended: true,
             flip: false,
@@ -36,31 +35,20 @@ export default class Explorer extends React.Component {
             fixedTonic: true,
             fixedOctave: false,
             tonicFirst: true,
-            rotate: 0,
+            tonicInBass: false,
+            invert: 0,
             order: undefined,
             autoplay: true,
             items: [],
-            group
+            group,
+            pianist: null
         };
     }
 
     pressedPianoKey(key) {
         const tokens = Note.tokenize(Note.fromMidi(key));
-        this.setState({ tonic: tokens[0] + tokens[1], octave: parseInt(tokens[2]) });
+        this.setState({ tonic: tokens[0] + tokens[1] });
         this.autoplay();
-    }
-
-    addShape(item) {
-        /* this.setState({ items: this.state.items.concat([item]) }) */
-        this.setState({ items: [item] });
-    }
-
-    removeShape(item) {
-        /* this.setState({
-            items: this.state.items
-                .filter(i => i.root !== item.root && i.symbol !== item.symbol)
-        }) */
-        this.setState({ items: [] });
     }
 
     shuffle(notes, tonicFirst = this.state.tonicFirst) {
@@ -73,45 +61,19 @@ export default class Explorer extends React.Component {
         this.autoplay();
     }
 
-    rotate(notes) {
-        this.setState({ rotate: (this.state.rotate + 1) % notes.length });
+    invert(notes) {
+        this.setState({ invert: (this.state.invert + 1) % notes.length });
         this.autoplay();
     }
 
-
-    smallestInterval(origin, target) {
-        const interval = Distance.interval(origin, target);
-        let up = Math.abs(Interval.semitones(interval)) % 12; // BUG: Interval.semitones('0A') is NaN instead of 0
-        let down = Math.abs(Interval.semitones(Interval.invert(interval))) % 12;
-        return up > down ? '-' + Interval.fromSemitones(down) : Interval.fromSemitones(up);
-    }
-
-    newTonicState(tonic, fixedOctave = this.state.fixedOctave, anchorNote = 'C4', maxAnchorDistance = 12) {
-        const smallestInterval = this.smallestInterval(this.state.tonic, tonic);
-        let newTonic = Note.simplify(Distance.transpose(this.state.tonic + this.state.octave, smallestInterval));
-        if (Note.props(newTonic).pc === this.state.tonic) {
-            newTonic = Note.enharmonic(newTonic);
-        }
-
-        let octave = !fixedOctave ? Note.props(newTonic).oct : this.state.octave;
-        const distanceToAnchor = Interval.semitones(Distance.interval(anchorNote, newTonic));
-        // jump octave down if getting too far away from anchorNote
-        if (Math.abs(distanceToAnchor) > maxAnchorDistance) {
-            octave += distanceToAnchor > 0 ? -1 : 1;
-        }
-        const pc = Note.props(newTonic).pc;
-        // console.log(`${this.state.tonic}${this.state.octave} > ${tonic} = ${smallestInterval} > ${tonic}${octave}`);
-        return { tonic: pc, octave: octave || this.state.octave };
-    }
-
     newTonic(note) {
-        this.setState(this.newTonicState(note));
+        this.setState(newTonicState(note, this.state));
         this.autoplay();
     }
 
     fifthDown() {
-        this.setState(this.newTonicState(Distance.trFifths(this.state.tonic, -1)));
-        this.autoplay(false);
+        this.setState(newTonicState(Distance.trFifths(this.state.tonic, -1), this.state));
+        this.autoplay();
     }
 
     randomTonic(maxFifthDistance) {
@@ -122,76 +84,35 @@ export default class Explorer extends React.Component {
             const fifthDistance = (Math.random() > 0.5 ? -1 : 1) * Math.ceil(Math.random() * maxFifthDistance);
             newTonic = Distance.trFifths(this.state.tonic, fifthDistance);
         }
-        this.setState(this.newTonicState(newTonic));
-        this.autoplay(false);
+        this.setState(newTonicState(newTonic, this.state));
+        this.autoplay();
     }
 
     randomChordOrScale(keepTonic = false, type) {
         const isChord = type === 'chord' ? true : (type === 'scale' ? false : Math.random() > 0.5);
-        const group = this.state.group || 'Advanced';
+        const group = this.state.group || 'Diatonic';
         const newTonic = keepTonic ? this.state.tonic : randomItem(this.chromatics);
 
         this.setState(Object.assign({
             scale: !isChord ? randomScale(group) : null,
             chord: isChord ? randomChord(group) : null,
-            order: null, rotate: 0
-        }, this.newTonicState(newTonic)));
-
-        this.autoplay(isChord);
+            order: null, invert: 0, oldState: this.state
+        }, newTonicState(newTonic, this.state)));
+        this.autoplay();
     };
 
-    loadSound(src, context) {
-        const source = context.createBufferSource();
-        return fetch(src)
-            .then(res => res.arrayBuffer())
-            .then(buffer => {
-                return new Promise((resolve, reject) => {
-                    context.decodeAudioData(buffer, (decodedData) => {
-                        source.buffer = decodedData;
-                        source.connect(context.destination);
-                        resolve(source);
-                    });
-                })
-            });
+    useData(data) {
+        this.setState(Object.assign(data, newTonicState(data.tonic, this.state)));
+        this.autoplay();
     }
-
-    loadSounds(sources, context) {
-        sources.forEach((source, i) => {
-            if (!source) {
-                console.warn(`note at index ${i} cannot be played!`);
-            }
-        })
-        return Promise.all(sources.filter(source => !!source).map(source => this.loadSound(source, context)));
-    }
-
-    playNotes(scorenotes, interval = 0, offset = 36) {
-        const context = new AudioContext();
-        const clock = new WAAClock(context);
-        clock.start();
-        this.loadSounds(scorenotes.map(note => sounds[Note.props(note).midi - offset]), context)
-            .then(sounds => {
-                sounds.forEach((sound, i) => {
-                    if (interval === 0) {
-                        sound.start(0);
-                    } else {
-                        clock.setTimeout(function (event) {
-                            sound.start(0);
-                        }, interval * i);
-                    }
-                })
-            });
-    }
-
-
-
-    listen(harmonic = false) {
-        const bpm = 200;
-        this.playNotes(getProps(this.state).scorenotes, harmonic ? 0 : 60 / bpm);
-    }
-
-    autoplay(harmonic = false) {
-        if (this.state.autoplay) {
-            setTimeout(() => this.listen(harmonic));
+    /** Calls play if autoplay is set to true */
+    autoplay() {
+        if (this.state.autoplay && this.state.pianist) {
+            setTimeout(() => {
+                this.state.pianist.play();
+            })
+        } else if (!this.state.pianist) {
+            console.log('no pianist found :(');
         }
     }
 
@@ -199,8 +120,6 @@ export default class Explorer extends React.Component {
         let piano, circle, label, score = '';
         const props = getProps(this.state);
         label = <h2>{props.label}</h2>;
-        // const skeletons = this.state.items.map(item => getProps(item).chroma);
-        // skeletons={skeletons}
         const order = props.notes.map(note => Note.props(note).chroma);
 
         circle = (<CircleSet
@@ -232,22 +151,15 @@ export default class Explorer extends React.Component {
             return <li key={index} className={this.state.group === group ? 'active' : ''} onClick={() => this.setState({ group })}>{group}</li>
         });
 
-        const material = <Material key="material" props={props} onClick={(data) => this.setState(data)}
-            onMouseEnter={(item) => this.addShape(item)}
-            onMouseLeave={(item) => this.removeShape(item)}
-        />
+        const material = <Material key="material" props={props} onClick={(data) => this.useData(data)} />
 
         const chordsAndScales = (
             <div key="chordsAndScales">
                 <h2>Chords & Scales</h2>
                 <Chords group={this.state.group} props={props}
-                    onClick={(state) => this.setState(state)}
-                    onMouseEnter={(item) => this.addShape(item)}
-                    onMouseLeave={(item) => this.removeShape(item)} />
+                    onClick={(state) => this.useData(state)} />
                 <Scales group={this.state.group} props={props}
-                    onClick={(state) => this.setState(state)}
-                    onMouseEnter={(item) => this.addShape(item)}
-                    onMouseLeave={(item) => this.removeShape(item)} />
+                    onClick={(state) => this.useData(state)} />
             </div>);
 
         let views = [material, chordsAndScales];
@@ -292,28 +204,36 @@ export default class Explorer extends React.Component {
 
                     <ul className="action-buttons">
                         <li>
-                            <a onClick={() => this.rotate(props.notes)}>ROTATE</a>
+                            <a onClick={() => this.setState(this.state.oldState)}>back</a>
                         </li>
                         <li>
-                            <a onClick={() => this.shuffle(props.notes)}>SHUFFLE</a>
+                            <a onClick={() => this.invert(props.notes)}>invert {this.state.invert}</a>
                         </li>
                         <li>
-                            <a onClick={() => this.setState({ order: null, rotate: 0 })}>CLEAR</a>
+                            <a onClick={() => this.shuffle(props.notes)}>shuffle</a>
                         </li>
                         <li>
-                            <a onClick={() => this.randomChordOrScale(this.state.fixedTonic, 'chord')}>% CHORD</a>
+                            <a onClick={() => this.setState({ order: null, invert: 0 })}>clear</a>
                         </li>
                         <li>
-                            <a onClick={() => this.randomChordOrScale(this.state.fixedTonic, 'scale')}>% SCALE</a>
+                            <a onClick={() => this.randomChordOrScale(this.state.fixedTonic, 'chord')}>% chord</a>
                         </li>
                         <li>
-                            <a onClick={() => this.randomTonic(2)}>% TONIC</a>
+                            <a onClick={() => this.randomChordOrScale(this.state.fixedTonic, 'scale')}>% scale</a>
                         </li>
                         <li>
-                            <a onClick={() => this.fifthDown()}>-5</a>
+                            <a onClick={() => this.randomTonic(2)}>% tonic</a>
                         </li>
                         <li>
-                            <a onClick={() => this.listen()}>LISTEN</a>
+                            <a onClick={() => this.fifthDown()}>-fifth</a>
+                        </li>
+                        <li>
+                            <a onClick={() => this.setState({ fixedChroma: this.state.fixedChroma ? null : props.chroma, fixedLabel: props.label })}>
+                                {!this.state.fixedChroma ? 'keep' : 'remove'} {this.state.fixedChroma ? this.state.fixedLabel : props.label}
+                            </a>
+                        </li>
+                        <li>
+                            <Pianist notes={props.scorenotes} onMounted={(pianist) => this.setState({ pianist })} autoplay={this.state.autoplay} overlap={this.state.overlap} harmonic={!!props.chord} />
                         </li>
                     </ul>
                     {views}
@@ -340,6 +260,8 @@ export default class Explorer extends React.Component {
                         <li className={this.state.fixedTonic ? 'active' : ''} onClick={() => this.setState({ fixedTonic: !this.state.fixedTonic })}>fixedTonic</li>
                         <li className={this.state.fixedOctave ? 'active' : ''} onClick={() => this.setState({ fixedOctave: !this.state.fixedOctave })}>fixedOctave</li>
                         <li className={this.state.tonicFirst ? 'active' : ''} onClick={() => this.setState({ tonicFirst: !this.state.tonicFirst })}>tonicFirst</li>
+                        <li className={this.state.tonicInBass ? 'active' : ''} onClick={() => this.setState({ tonicInBass: !this.state.tonicInBass })}>tonicInBass</li>
+                        <li className={this.state.overlap ? 'active' : ''} onClick={() => this.setState({ overlap: !this.state.overlap })}>overlap</li>
                     </ul>
                     <h2>Help</h2>
                     This tool visualizes the connection between musical chords and scales. The colors have the following meanings:

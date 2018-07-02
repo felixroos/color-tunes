@@ -4,7 +4,7 @@ import { symbolClasses } from './Chroma';
 import { chordNames, symbolName } from './Symbols';
 
 
-export default class Scales extends React.Component {
+export default class Chords extends React.Component {
     render() {
         const props = this.props.props;
         const chords = chordNames(this.props.group)
@@ -22,9 +22,7 @@ export default class Scales extends React.Component {
         }, []).map(group =>
             group.map((chord, index) => (
                 (<li key={index} className={symbolClasses('chord', chord, props)}
-                    onClick={() => this.props.onClick({ scale: null, chord, order: null })}
-                    onMouseEnter={() => this.props.onMouseEnter(Object.assign(props, { scale: null, chord }))}
-                    onMouseLeave={() => this.props.onMouseLeave(Object.assign(props, { scale: null, chord }))}>
+                    onClick={() => this.props.onClick({ scale: null, chord, order: null })}>
                     {symbolName('chord', chord)}
                 </li>)
             )))

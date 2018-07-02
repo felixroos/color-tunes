@@ -3,6 +3,7 @@ import { transpose } from 'tonal';
 import * as TonalArray from 'tonal-array';
 import * as Chord from 'tonal-chord';
 import * as Distance from 'tonal-distance';
+import * as Interval from 'tonal-interval';
 import * as Note from 'tonal-note';
 import * as PcSet from 'tonal-pcset';
 import * as Scale from 'tonal-scale';
@@ -30,7 +31,6 @@ export function isChromaParent(chroma, child) {
     }).reduce((match, current) => match && current, true);
 }
 
-
 export function isChromaChild(chroma, parent) {
     return chroma !== parent && chroma.split('').map((value, index) => {
         return value === '0' || parent[index] === value;
@@ -56,6 +56,9 @@ export function filterScaleLength(length) {
 
 export function sortByDistanceToTonic(tonic) {
     return (a, b) => Distance.semitones(tonic, a.root) < Distance.semitones(tonic, b.root) ? -1 : 1;
+}
+export function sortByFifthDistanceToTonic(tonic) {
+    return (a, b) => Distance.fifths(tonic, a.root) < Distance.fifths(tonic, b.root) ? -1 : 1;
 }
 
 export function chromaLength(chroma) {
@@ -127,12 +130,69 @@ export function parallelSymbols(type, parallel, props) {
     return props.parallels[type + 's'].reduce((items, item, index) => {
         return items.concat(item[parallel].map(root => ({ root, symbol: item.symbol })))
             .sort(sortByDistanceToTonic(props.tonic));
+        //.sort(sortByFifthDistanceToTonic(props.tonic));
     }, []);
 }
 
+export function transposePitch(pc, scorenotes, semitones) {
+    return scorenotes.map(note => {
+        if (Note.pc(note) === pc) {
+            return transpose(note, Interval.fromSemitones(semitones));
+        }
+        return note;
+    });
+}
 
-export const center = (pc, octave = 3) => pc ? pc + octave : null
-/* pc ? (pc[0] === "A" || pc[0] === "B" ? pc + octave : pc + parseInt(octave + 1)) : null; */
+export function getSmallestInterval(pc1, pc2) {
+    const interval = Distance.interval(pc1, pc2);
+    let up = Math.abs(Interval.semitones(interval)) % 12; // BUG: Interval.semitones('0A') is NaN instead of 0
+    let down = Math.abs(Interval.semitones(Interval.invert(interval))) % 12;
+    return up > down ? '-' + Interval.fromSemitones(down) : Interval.fromSemitones(up);
+}
+
+export function getEnvelope(scorenotes) {
+    // lowest and highest note
+    return scorenotes.map(note => Note.midi(note))
+        .sort().map(midi => scorenotes.find(n => Note.midi(n) === midi))
+        .filter((note, i) => (i === 0 || i === scorenotes.length - 1));
+}
+
+export function envelopeDistance(a, b) {
+    return [Note.midi(a[0]) - Note.midi(b[0]), Note.midi(a[1]) - Note.midi(b[1])];
+}
+
+export function envelopeCut(scorenotes, envelope = ['C2', 'C5']) {
+    // lowest and highest note
+    const minMax = getEnvelope(scorenotes);
+    // transposes all notes octave up / down when outside maxEnvelope
+    if (Note.midi(minMax[0]) <= Note.midi(envelope[0])) {
+        return scorenotes.map(note => transpose(note, Interval.fromSemitones(12)));
+    } if (Note.midi(minMax[1]) > Note.midi(envelope[1])) {
+        return scorenotes.map(note => transpose(note, Interval.fromSemitones(-12)));
+    }
+    return scorenotes;
+}
+
+export function newTonicState(tonic, state) {
+    /* 
+        if (state.tonicInBass) {
+            anchorNote = Distance.transpose(anchorNote, Interval.fromSemitones(-12));
+        } */
+
+    const smallestInterval = getSmallestInterval(state.tonic, tonic);
+
+    let invert = state.invert;
+    /* if (Math.abs(Interval.semitones(smallestInterval)) >= 3) {
+         invert += 2;
+     } */
+
+    let newTonic = Note.simplify(Distance.transpose((state.tonic + state.octave), smallestInterval));
+    if (Note.props(newTonic).pc === state.tonic) {
+        newTonic = Note.enharmonic(newTonic);
+    }
+    const pc = Note.props(newTonic).pc;
+    return { tonic: pc, invert, octave: Note.props(newTonic).oct };
+}
 
 export function getProps(state) {
     let label;
@@ -144,12 +204,15 @@ export function getProps(state) {
     if (!state.scale && !state.chord) {
         return;
     }
+
+    const fullTonic = state.tonic + state.octave;
+
     tonic = state.tonic;
     if (state.scale) {
         notes = removeOctaves(Scale.notes(tonic, state.scale));
-        chroma = PcSet.chroma(notes);
+        chroma = state.fixedChroma || PcSet.chroma(notes);
         intervals = Scale.intervals(state.scale);
-        scorenotes = intervals.map(transpose(center(tonic, state.octave)));
+        scorenotes = intervals.map(transpose(fullTonic));
         label = tonic + ' ' + symbolName('scale', state.scale);
         subsets = getSubsets(state.scale, true, state.group);
         supersets = getSupersets(state.scale, true, state.group);
@@ -158,19 +221,33 @@ export function getProps(state) {
         // TODO: bug resport: 4 and 5 chords (possibly more) do not omit the octave after the notes
         notes = removeOctaves(Chord.notes(chord));
         const intervals = Chord.intervals(chord).map(i => i.replace('13', '6'));
-        scorenotes = intervals.map(transpose(center(tonic, state.octave)));
-        chroma = chordChroma(state.tonic, state.chord);
+        scorenotes = intervals.map(transpose(fullTonic));
+        if (state.tonicInBass) {
+            scorenotes = transposePitch(tonic, scorenotes, -12);
+        }
+        chroma = state.fixedChroma || chordChroma(state.tonic, state.chord);
         label = tonic + symbolName('chord', state.chord);
         subsets = getSubsets(state.chord, false, state.group);
         supersets = getSupersets(state.chord, false, state.group);
     }
-    if (state.rotate) {
-        scorenotes = TonalArray.rotate(state.rotate, scorenotes);
+
+    if (state.invert) {
+        state.invert = state.invert % notes.length;
+        scorenotes = scorenotes.map((note, index) => index < state.invert ? transpose(note, Interval.fromSemitones(12)) : note);
+        scorenotes = TonalArray.rotate(state.invert, scorenotes);
     }
+
+    scorenotes = envelopeCut(scorenotes);
+    state.octave = Note.props(scorenotes.find(n => Note.pc(n) === tonic)).oct;
+    if (state.invert) {
+        state.octave -= 1;
+    }
+
     if (state.order) {
         notes = state.order.map(i => notes[i]);
         scorenotes = state.order.map(i => scorenotes[i]);
     }
+
     const labels = getChromaticLabels(notes);
 
     const parallels = chromaParallels(chroma, state.group);
@@ -186,6 +263,7 @@ export function getChromaticLabels(notes) {
 }
 
 export function symbolClasses(type, symbol, props, differentRoot) {
+    differentRoot = differentRoot ? Note.midi(props.tonic + '2') !== Note.midi(differentRoot + '2') : null;
     if (props[type] === symbol && !differentRoot) {
         return 'active';
     }

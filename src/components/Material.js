@@ -15,10 +15,8 @@ export default class Material extends React.Component {
                 order: null
             };
             return (<li key={index}
-                className={symbolClasses(type, item.symbol, props, props.tonic !== item.root)}
+                className={symbolClasses(type, item.symbol, props, item.root)}
                 onClick={() => this.props.onClick(data)}
-                onMouseEnter={() => this.props.onMouseEnter(data)}
-                onMouseLeave={() => this.props.onMouseLeave(data)}
             >
                 {item.root}{type === 'scale' ? ' ' : ''}{symbolName(type, item.symbol)}
             </li>);

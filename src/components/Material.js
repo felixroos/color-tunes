@@ -11,8 +11,7 @@ export default class Material extends React.Component {
             const data = {
                 [type]: item.symbol,
                 [type === 'scale' ? 'chord' : 'scale']: null,
-                tonic: item.root,
-                order: null
+                tonic: item.root
             };
             return (<li key={index}
                 className={symbolClasses(type, item.symbol, props, item.root)}

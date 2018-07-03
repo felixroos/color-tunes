@@ -22,7 +22,7 @@ export default class Scales extends React.Component {
         }, []).map(group =>
             group.map((scale, index) => (
                 (<li key={index} className={symbolClasses('scale', scale, props)}
-                    onClick={() => this.props.onClick({ chord: null, scale, order: null })}>
+                    onClick={() => this.props.onClick({ chord: null, scale })}>
                     {symbolName('scale', scale)}
                 </li>)
             )))

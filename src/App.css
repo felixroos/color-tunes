@@ -8,7 +8,7 @@ body {
     /* font-family: "Helvetica Neue", Helvetica, sans-serif; */
     font-weight: normal;
     max-width: 92rem;
-    padding: 0.1rem 1rem 4rem 1em;
+    padding: 5px;
     background-color: white;
     box-shadow: 1px 1px rgba(0, 0, 0, 0.1);
     margin: 0;

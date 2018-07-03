@@ -161,7 +161,7 @@ export function envelopeDistance(a, b) {
     return [Note.midi(a[0]) - Note.midi(b[0]), Note.midi(a[1]) - Note.midi(b[1])];
 }
 
-export function envelopeCut(scorenotes, envelope = ['C2', 'C5']) {
+export function envelopeCut(scorenotes, envelope = ['A2', 'C5']) {
     // lowest and highest note
     const minMax = getEnvelope(scorenotes);
     // transposes all notes octave up / down when outside maxEnvelope
@@ -178,7 +178,9 @@ export function newTonicState(tonic, state) {
         if (state.tonicInBass) {
             anchorNote = Distance.transpose(anchorNote, Interval.fromSemitones(-12));
         } */
-
+    if (state.fixedOctave) {
+        return { tonic };
+    }
     const smallestInterval = getSmallestInterval(state.tonic, tonic);
 
     let invert = state.invert;
@@ -192,6 +194,10 @@ export function newTonicState(tonic, state) {
     }
     const pc = Note.props(newTonic).pc;
     return { tonic: pc, invert, octave: Note.props(newTonic).oct };
+}
+
+export function isOrdered(order) {
+    return order.reduce((ordered, v, i) => ordered && i === v, true);
 }
 
 export function getProps(state) {
@@ -229,13 +235,13 @@ export function getProps(state) {
         label = tonic + symbolName('chord', state.chord);
         subsets = getSubsets(state.chord, false, state.group);
         supersets = getSupersets(state.chord, false, state.group);
-    }
+    }/* 
 
     if (state.invert) {
         state.invert = state.invert % notes.length;
         scorenotes = scorenotes.map((note, index) => index < state.invert ? transpose(note, Interval.fromSemitones(12)) : note);
         scorenotes = TonalArray.rotate(state.invert, scorenotes);
-    }
+    } */
 
     scorenotes = envelopeCut(scorenotes);
     state.octave = Note.props(scorenotes.find(n => Note.pc(n) === tonic)).oct;
@@ -244,8 +250,15 @@ export function getProps(state) {
     }
 
     if (state.order) {
-        notes = state.order.map(i => notes[i]);
-        scorenotes = state.order.map(i => scorenotes[i]);
+        const order = state.order.filter(i => notes[i]);
+        notes = order.map(i => notes[i]);
+        scorenotes = order.map(i => scorenotes[i]);
+    }
+
+    if (state.invert) {
+        state.invert = state.invert % notes.length;
+        scorenotes = scorenotes.map((note, index) => index < state.invert ? transpose(note, Interval.fromSemitones(12)) : note);
+        scorenotes = TonalArray.rotate(state.invert, scorenotes);
     }
 
     const labels = getChromaticLabels(notes);

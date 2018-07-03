@@ -1,8 +1,10 @@
 import React from 'react';
 import * as Distance from 'tonal-distance';
 import * as Note from 'tonal-note';
+import * as TonalArray from 'tonal-array';
+import * as Interval from 'tonal-interval';
 import Chords from './components/Chords';
-import { getProps, newTonicState } from './components/Chroma';
+import { getProps, newTonicState, parallelSymbols } from './components/Chroma';
 import { circleIndex, CircleSet } from './components/CircleSet';
 import { stepColor } from './components/Colorizer';
 import Material from './components/Material';
@@ -15,27 +17,29 @@ import './Explorer.css';
 
 export default class Explorer extends React.Component {
     chromatics = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
-
+    defaultGroup = 'Advanced';
     constructor() {
         super();
         const isChord = Math.random() > 0.5;
-        const group = 'Diatonic';
+        const group = this.defaultGroup;
         this.state = {
             circle: 'fourths',
-            // tonic: randomItem(this.chromatics),
-            tonic: 'C',
+            tonic: randomItem(this.chromatics),
+            //tonic: 'C',
             octave: 3,
-            scale: 'major',
-            //scale: !isChord ? randomScale(group) : null,
-            //chord: isChord ? randomChord(group) : null,
+            // scale: 'major',
+            scale: !isChord ? randomScale(group) : null,
+            chord: isChord ? randomChord(group) : null,
             history: [],
             extended: true,
             flip: false,
             ordered: true,
-            fixedTonic: true,
+            fixedTonic: false,
             fixedOctave: false,
-            tonicFirst: true,
+            tonicFirst: false,
+            tonicLast: false,
             tonicInBass: false,
+            arpeggiate: true,
             invert: 0,
             order: undefined,
             autoplay: true,
@@ -51,12 +55,68 @@ export default class Explorer extends React.Component {
         this.autoplay();
     }
 
-    shuffle(notes, tonicFirst = this.state.tonicFirst) {
-        const order = notes.map((n, i) => i).sort(() => 1 - 2 * Math.random());
-        if (tonicFirst) {
-            order[order.indexOf(0)] = order[0];
-            order[0] = 0;
+    positionIndex(order, i, position) {
+        order[order.indexOf(i)] = order[position];
+        order[position] = i;
+        return order;
+    }
+
+    insertTonic(order, notes) {
+        if (this.state.tonicFirst) { // move tonic to 0
+            order = this.positionIndex(order, 0, 0);
         }
+        order = order.slice(0, notes.length);
+        if (this.state.tonicLast) {
+            order = this.positionIndex(order, 0, order.length - 1);
+        }
+        return order;
+    }
+
+    shuffle(notes) {
+        let props = getProps(Object.assign(this.state, { order: null }));
+        let order = props.notes.map((n, i) => i).sort(() => 1 - 2 * Math.random())
+        order = this.insertTonic(order, notes);
+        this.setState({ order });
+        this.autoplay();
+    }
+
+    cutNote(scorenotes) {
+        let order = this.state.order;
+        if (!order) {
+            order = scorenotes.map((n, i) => i);
+        }
+        if (order.length === 1) {
+            return;
+        }
+        order = order.slice(0, order.length - 1);
+        /* order = this.insertTonic(order, scorenotes); */
+        this.setState({ order });
+        this.autoplay();
+    }
+
+    /** concats given array of indices all missing indices for the given length */
+    fillIndices(indices, targetLength) {
+        if (indices.length === targetLength) {
+            return indices;
+        }
+        const missingIndices = new Array(targetLength).fill(0)
+            .map((e, i) => i)
+            .filter(i => indices.indexOf(i) === -1);
+        return indices.concat(missingIndices).slice(0, targetLength);
+    }
+
+    addNote(scorenotes) {
+        let order = this.state.order;
+        let props = getProps(Object.assign(this.state, { order: null }));
+        if (!order) {
+            order = scorenotes.map((n, i) => i);
+        }
+        if (props.scorenotes.length === scorenotes.length) {
+            console.log('cannot add more notes', this.state);
+            return;
+        }
+        order = this.fillIndices(order, scorenotes.length + 1);
+        /* order = this.insertTonic(order, order); */
         this.setState({ order });
         this.autoplay();
     }
@@ -71,8 +131,75 @@ export default class Explorer extends React.Component {
         this.autoplay();
     }
 
+    getStep(chroma, tonic, step = 1) {
+        const currentIndex = Note.chroma(tonic);
+        const rotated = TonalArray.rotate(currentIndex, chroma.split(''));
+        const nextIndices = rotated.reduce((matches, v, i) => {
+            if (v === '1') {
+                return matches.concat(i);
+            }
+            return matches;
+        }, []).map(i => (i + currentIndex) % 12);
+        return this.chromatics[nextIndices[step]];
+    }
+
     fifthDown() {
-        this.setState(newTonicState(Distance.trFifths(this.state.tonic, -1), this.state));
+        if (!this.state.fixedChroma) {
+            this.setState(newTonicState(Distance.trFifths(this.state.tonic, -1), this.state));
+        } else {
+            this.setState(newTonicState(this.getStep(this.state.fixedChroma, this.state.tonic, 3), this.state));
+        }
+        this.autoplay();
+    }
+
+    /** starts from tonic and sets the next note in the given chroma as new tonic */
+    nextRoot(chroma, tonic = this.state.tonic) {
+        const nextRoot = this.getStep(chroma, tonic, 1);
+        this.setState(newTonicState(nextRoot, this.state));
+        this.autoplay();
+    }
+
+    // TODO: fuse with nextSibling
+
+    nextStep(props, distance = 1) {
+        let parallel = [];
+        if (props.chord) {
+            parallel = parallelSymbols('chord', 'sub', props);
+        } else {
+            parallel = parallelSymbols('scale', 'roots', props);
+        }
+        const intervals = parallel.map((p, i) => ({ i, root: p.root, distance: (Interval.semitones(Distance.interval(props.tonic, p.root)) + 12) % 12 }))
+            .filter(d => d.distance >= distance)
+            .sort((a, b) => a.distance < b.distance ? -1 : 1);
+        if (!intervals.length) {
+            return;
+        }
+        const next = parallel[intervals[0].i];
+        if (!next) {
+            return;
+        }
+        this.setState(Object.assign({ [props.chord ? 'chord' : 'scale']: next.symbol }, newTonicState(next.root, this.state)));
+        this.autoplay();
+    }
+
+    nextSibling(props, distance = 1) {
+        let parallel = [];
+        if (props.chord) {
+            parallel = parallelSymbols('chord', 'sub', props);
+        } else {
+            parallel = parallelSymbols('scale', 'roots', props);
+        }
+        const intervals = parallel.map((p, i) => ({ i, root: p.root, distance: (Distance.fifths(p.root, props.tonic) + 12) % 12 }))
+            .filter(d => d.distance >= distance)
+            .sort((a, b) => a.distance < b.distance ? -1 : 1);
+        if (!intervals.length) {
+            return;
+        }
+        const next = parallel[intervals[0].i];
+        if (!next) {
+            return;
+        }
+        this.setState(Object.assign({ [props.chord ? 'chord' : 'scale']: next.symbol }, newTonicState(next.root, this.state)));
         this.autoplay();
     }
 
@@ -90,13 +217,13 @@ export default class Explorer extends React.Component {
 
     randomChordOrScale(keepTonic = false, type) {
         const isChord = type === 'chord' ? true : (type === 'scale' ? false : Math.random() > 0.5);
-        const group = this.state.group || 'Diatonic';
+        const group = this.state.group || this.defaultGroup;
         const newTonic = keepTonic ? this.state.tonic : randomItem(this.chromatics);
 
         this.setState(Object.assign({
             scale: !isChord ? randomScale(group) : null,
             chord: isChord ? randomChord(group) : null,
-            order: null, invert: 0, oldState: this.state
+            /* order: null, invert: 0, */ oldState: this.state
         }, newTonicState(newTonic, this.state)));
         this.autoplay();
     };
@@ -202,39 +329,51 @@ export default class Explorer extends React.Component {
 
                     {!this.state.hideCircle ? circle : ''}
 
-                    <ul className="action-buttons">
-                        <li>
+                    <h5>Permutator</h5>
+                    <ul className="scroll">
+                        {/* <li>
                             <a onClick={() => this.setState(this.state.oldState)}>back</a>
+                        </li> */}
+                        <li onClick={() => this.invert(props.notes)} className={this.state.invert > 0 ? 'active' : ''}>
+                            inversion {this.state.invert || ''}
                         </li>
-                        <li>
-                            <a onClick={() => this.invert(props.notes)}>invert {this.state.invert}</a>
+                        <li onClick={() => this.shuffle(props.notes)} className={this.state.order ? 'active' : ''}>
+                            shuffle {this.state.order ? this.state.order.length : ''}
                         </li>
-                        <li>
-                            <a onClick={() => this.shuffle(props.notes)}>shuffle</a>
+                        <li onClick={() => this.setState({ order: null, invert: 0 })} className={this.state.order || this.state.invert > 0 ? 'parallel' : ''}>
+                            clear
                         </li>
-                        <li>
-                            <a onClick={() => this.setState({ order: null, invert: 0 })}>clear</a>
+                        <li onClick={() => this.cutNote(props.scorenotes)}>
+                            -note
                         </li>
-                        <li>
-                            <a onClick={() => this.randomChordOrScale(this.state.fixedTonic, 'chord')}>% chord</a>
+                        <li onClick={() => this.addNote(props.scorenotes)}>
+                            +note
                         </li>
-                        <li>
-                            <a onClick={() => this.randomChordOrScale(this.state.fixedTonic, 'scale')}>% scale</a>
+                        <li className={this.state.tonicFirst ? 'active' : ''} onClick={() => { this.setState({ tonicFirst: !this.state.tonicFirst, tonicLast: false }); this.shuffle(props.notes) }}>tonicFirst</li>
+                        <li className={this.state.tonicLast ? 'active' : ''} onClick={() => { this.setState({ tonicLast: !this.state.tonicLast, tonicFirst: false }); this.shuffle(props.notes) }}>tonicLast</li>
+                    </ul>
+                    <h5>Composer</h5>
+                    <ul className="scroll">
+                        <li onClick={() => this.setState({ fixedChroma: this.state.fixedChroma ? null : props.chroma, fixedLabel: props.label })} className={this.state.fixedChroma ? 'active' : ''}>
+                            {!this.state.fixedChroma ? 'focus' : 'blur'} {this.state.fixedChroma ? this.state.fixedLabel : ''}{/* props.label */}
                         </li>
-                        <li>
-                            <a onClick={() => this.randomTonic(2)}>% tonic</a>
-                        </li>
-                        <li>
-                            <a onClick={() => this.fifthDown()}>-fifth</a>
-                        </li>
-                        <li>
-                            <a onClick={() => this.setState({ fixedChroma: this.state.fixedChroma ? null : props.chroma, fixedLabel: props.label })}>
-                                {!this.state.fixedChroma ? 'keep' : 'remove'} {this.state.fixedChroma ? this.state.fixedLabel : props.label}
-                            </a>
-                        </li>
-                        <li>
-                            <Pianist notes={props.scorenotes} onMounted={(pianist) => this.setState({ pianist })} autoplay={this.state.autoplay} overlap={this.state.overlap} harmonic={!!props.chord} />
-                        </li>
+                        <li onClick={() => this.nextSibling(props)} className={this.state.fixedChroma ? 'active' : ''}>+harmonic sibling</li>
+                        <li onClick={() => this.nextStep(props)} className={this.state.fixedChroma ? 'active' : ''}>+sibling</li>
+                        <li onClick={() => this.nextRoot(this.state.fixedChroma || props.chroma)} className={this.state.fixedChroma ? 'parallel' : ''}>+step</li>
+                        <li onClick={() => this.fifthDown()} className={this.state.fixedChroma ? 'parallel' : ''}>-fifth</li>
+                        <li onClick={() => this.randomChordOrScale(this.state.fixedTonic, 'chord')}>% chord</li>
+                        <li onClick={() => this.randomChordOrScale(this.state.fixedTonic, 'scale')}>% scale</li>
+                        <li onClick={() => this.randomTonic(2)}>% tonic</li>
+                        {/* <li className={this.state.fixedTonic ? 'active' : ''} onClick={() => this.setState({ fixedTonic: !this.state.fixedTonic })}>fixedTonic</li> */}
+                    </ul>
+                    <h5>Pianist</h5>
+                    <ul className="scroll">
+                        <li><Pianist notes={props.scorenotes} onMounted={(pianist) => this.setState({ pianist })} autoplay={this.state.autoplay} overlap={this.state.overlap} harmonic={!this.state.arpeggiate} /></li>{/* <!-- !!props.chord &&  --> */}
+                        <li className={this.state.autoplay ? 'active' : ''} onClick={() => this.setState({ autoplay: !this.state.autoplay })}>autoplay</li>
+                        <li className={this.state.fixedOctave ? 'active' : ''} onClick={() => this.setState({ fixedOctave: !this.state.fixedOctave })}>fixedOctave</li>
+                        <li className={this.state.tonicInBass ? 'active' : ''} onClick={() => this.setState({ tonicInBass: !this.state.tonicInBass })}>tonicInBass</li>
+                        <li className={this.state.arpeggiate ? 'active' : ''} onClick={() => this.setState({ arpeggiate: !this.state.arpeggiate })}>arpeggiate</li>
+                        <li className={this.state.overlap ? 'active' : ''} onClick={() => this.setState({ overlap: !this.state.overlap })}>overlap</li>
                     </ul>
                     {views}
                     <h2>Settings</h2>
@@ -253,15 +392,6 @@ export default class Explorer extends React.Component {
                     <ul className="scroll">
                         {circles}
                         <li className={this.state.ordered ? 'active' : ''} onClick={() => this.setState({ ordered: !this.state.ordered })}>show order</li>
-                    </ul>
-                    <h5>Player</h5>
-                    <ul className="scroll">
-                        <li className={this.state.autoplay ? 'active' : ''} onClick={() => this.setState({ autoplay: !this.state.autoplay })}>Autoplay</li>
-                        <li className={this.state.fixedTonic ? 'active' : ''} onClick={() => this.setState({ fixedTonic: !this.state.fixedTonic })}>fixedTonic</li>
-                        <li className={this.state.fixedOctave ? 'active' : ''} onClick={() => this.setState({ fixedOctave: !this.state.fixedOctave })}>fixedOctave</li>
-                        <li className={this.state.tonicFirst ? 'active' : ''} onClick={() => this.setState({ tonicFirst: !this.state.tonicFirst })}>tonicFirst</li>
-                        <li className={this.state.tonicInBass ? 'active' : ''} onClick={() => this.setState({ tonicInBass: !this.state.tonicInBass })}>tonicInBass</li>
-                        <li className={this.state.overlap ? 'active' : ''} onClick={() => this.setState({ overlap: !this.state.overlap })}>overlap</li>
                     </ul>
                     <h2>Help</h2>
                     This tool visualizes the connection between musical chords and scales. The colors have the following meanings:

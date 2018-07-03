@@ -25,15 +25,11 @@ ul {
 
 .symbols {
     display: inline-block;
-    padding: 0 10px;
-    border: 1px solid #fafafa;
-    border-radius: 10px;
     margin: 0;
     box-sizing: border-box;
     flex-grow: 1;
     flex-basis: auto;
     max-height: 100%;
-    background-color: #fff;
     width: 100%;
 }
 

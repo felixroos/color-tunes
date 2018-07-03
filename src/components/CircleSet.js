@@ -92,7 +92,6 @@ export class CircleSet extends React.Component {
         }, '')
     }
 
-
     render() {
         let size = this.props.size || 300;
         if (typeof size === 'string') {
@@ -125,6 +124,7 @@ export class CircleSet extends React.Component {
                         {label}
                     </text>)
             });
+
         const classNames = 'Circle ' + this.props.type;
         const originIndex = labels.indexOf(this.props.origin);
         const dot = this.getPoint(originIndex, size, offset, clinch);

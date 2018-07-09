@@ -240,7 +240,7 @@ export function getProps(state) {
     scorenotes = envelopeCut(scorenotes);
     state.octave = Note.props(scorenotes.find(n => Note.pc(n) === tonic)).oct;
     if (state.invert) {
-        state.octave -= 1;
+        // state.octave -= 1;
     }
 
     const options = [].concat(scorenotes); // all option notes without order

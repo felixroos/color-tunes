@@ -28,7 +28,7 @@ export default class Explorer extends React.Component {
             //tonic: randomItem(this.chromatics),
             tonic: 'C',
             octave: 3,
-             scale: 'major',
+            scale: 'major',
             //scale: !isChord ? randomScale(group) : null,
             chord: isChord ? randomChord(group) : null,
             history: [],
@@ -76,45 +76,6 @@ export default class Explorer extends React.Component {
     randomized(notes) {
         let props = getProps(Object.assign(this.state, { order: null }));
         let order = [].concat(notes).map((n, i) => props.notes.indexOf(n));
-        this.setState({ order });
-        this.autoplay();
-    }
-
-    cutNote(scorenotes) {
-        let order = this.state.order;
-        if (!order) {
-            order = scorenotes.map((n, i) => i);
-        }
-        if (order.length === 1) {
-            return;
-        }
-        order = order.slice(0, order.length - 1);
-        this.setState({ order });
-        this.autoplay();
-    }
-
-    /** concats given array of indices all missing indices for the given length */
-    fillIndices(indices, targetLength) {
-        if (indices.length === targetLength) {
-            return indices;
-        }
-        const missingIndices = new Array(targetLength).fill(0)
-            .map((e, i) => i)
-            .filter(i => indices.indexOf(i) === -1);
-        return indices.concat(missingIndices).slice(0, targetLength);
-    }
-
-    addNote(scorenotes) {
-        let order = this.state.order;
-        let props = getProps(Object.assign(this.state, { order: null }));
-        if (!order) {
-            order = scorenotes.map((n, i) => i);
-        }
-        if (props.scorenotes.length === scorenotes.length) {
-            console.log('cannot add more notes', this.state);
-            return;
-        }
-        order = this.fillIndices(order, scorenotes.length + 1);
         this.setState({ order });
         this.autoplay();
     }
@@ -364,12 +325,6 @@ export default class Explorer extends React.Component {
                         </li> */}
                         <li onClick={() => this.setState({ order: null, invert: 0 })} className={this.state.order || this.state.invert > 0 ? 'parallel' : ''}>
                             clear
-                        </li>
-                        <li onClick={() => this.cutNote(props.scorenotes)}>
-                            -note
-                        </li>
-                        <li onClick={() => this.addNote(props.scorenotes)}>
-                            +note
                         </li>
                     </ul>
                     <h5>Composer</h5>

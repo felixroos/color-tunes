@@ -11,7 +11,7 @@
 }
 
 .Circle polygon, .Circle path.shape, .Circle .origin, .Circle text {
-    transition: all .2s linear;
+    transition: all .4s linear;
 }
 
 .Circle path.interconnections {
@@ -19,7 +19,7 @@
 }
 
 .Circle path.ordered {
-    transition: all .2s linear;
+    transition: all .4s linear;
 }
 
 /* 

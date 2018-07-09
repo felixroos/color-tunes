@@ -11,7 +11,7 @@ export default class Randomizer extends React.Component {
             unique: false,
             sequence: [],
             maxPicks: 3, // maximal allowed occurence of an option in a random set
-            maxRepeats: 1, // maximal allowed repetition of the same option
+            maxRepeats: 0, // maximal allowed repetition of the same option
         };
     }
 
@@ -93,17 +93,18 @@ export default class Randomizer extends React.Component {
         //return new Array(length).fill(0).map(() => [].concat(this.props.defaultItems));
         return new Array(x).fill(0).map(() => new Array(y).fill(true));
     }
-    setLength(length, options, items, sequence = this.state.sequence) {
+    setLength(length, items, sequence = this.state.sequence, options = this.state.options) {
         if (length > sequence.length) {
             //const extraSequence = this.randomize(this.defaultItems(length - sequence.length, items.length), items, this.state.unique);
             const appendOptions = this.defaultItems(length - sequence.length, items.length);
             sequence = this.randomize(appendOptions, items, this.state.unique, sequence);
         } else if (length < sequence.length) {
             sequence = sequence.slice(0, length);
+            options = options ? options.slice(0, length) : this.state.options;
         } else {
             return;
         }
-        this.setState({ length, sequence });
+        this.setState({ length, sequence, options });
 
         if (this.props.onRandom) {
             this.props.onRandom(sequence);
@@ -123,6 +124,7 @@ export default class Randomizer extends React.Component {
         if (!this.state.length && !this.props.length && options.length < items.length) {
             options = options.concat(new Array(items.length - options.length)).fill(0)
                 .map(() => [].concat(items));
+            console.log('options fill', options);
         }
         const _options =
             options.map((option, i) =>
@@ -139,19 +141,19 @@ export default class Randomizer extends React.Component {
 
         return (
             <div>
+                <div className="randomizer">
+                    {_options}
+                </div>
                 <ul>
                     <li onClick={() => this.generate(options, items)}>randomize</li>
                     <li className={this.state.unique ? 'active' : ''} onClick={() => this.setState({ unique: !this.state.unique })}>unique</li>
                     <li onClick={() => this.chessPattern(items, options, 2)}>chess 2</li>
                     <li onClick={() => this.chessPattern(items, options, 3)}>chess 3</li>
                     <li onClick={() => this.chessPattern(items, options, 4)}>chess 4</li>
-                    <li onClick={() => this.setLength(length - 1, options, items)}>-</li>
-                    <li onClick={() => this.setLength(length, options, items)}>{length}/{items.length}</li>
-                    <li onClick={() => this.setLength(length + 1, options, items)}>+</li>
+                    <li onClick={() => this.setLength(length - 1, items)}>-</li>
+                    <li onClick={() => this.setLength(length, items)}>{length}/{items.length}</li>
+                    <li onClick={() => this.setLength(length + 1, items)}>+</li>
                 </ul>
-                <div className="randomizer">
-                    {_options}
-                </div>
             </div >
         );
     }

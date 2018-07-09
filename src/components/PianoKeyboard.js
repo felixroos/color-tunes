@@ -15,9 +15,10 @@ const WHITE_HEIGHT = 150 * scale;
 const BLACK_WIDTH = 22 * scale;
 const BLACK_HEIGHT = 90 * scale;
 
-const getKeyTypes = (type, midi, pcset, scorenotes) => {
+const getKeyTypes = (type, midi, pcset, scorenotes, highlightedNotes = []) => {
     const chroma = midi % 12;
     const active = () => scorenotes && !!scorenotes.find(note => Note.props(note).midi === midi);
+    const highlight = () => highlightedNotes && !!highlightedNotes.find(note => Note.props(note).midi === midi);
     return cat([
         "piano-key",
         type,
@@ -25,12 +26,13 @@ const getKeyTypes = (type, midi, pcset, scorenotes) => {
             active: active(),
             tonic: active() && pcset.tonic === chroma,
             chroma: pcset.chroma[chroma] === "1",
-            'chroma-tonic': pcset.tonic === chroma
+            'chroma-tonic': pcset.tonic === chroma,
+            highlight: highlight(),
         }
     ]);
 };
 
-const Key = ({ type, chroma, i, oct, pcset, scorenotes, x, onClick }) => {
+const Key = ({ type, chroma, i, oct, pcset, scorenotes, highlightedNotes, x, onClick }) => {
     const isWhite = type === "white";
     const midi = (oct) * 12 + chroma;
     const offset = (isWhite
@@ -41,7 +43,7 @@ const Key = ({ type, chroma, i, oct, pcset, scorenotes, x, onClick }) => {
         e.preventDefault();
         onClick(midi);
     };
-    const keyClass = `note-${midi} ${getKeyTypes(type, midi, pcset, scorenotes)}`;
+    const keyClass = `note-${midi} ${getKeyTypes(type, midi, pcset, scorenotes, highlightedNotes)}`;
 
     return (
         <rect
@@ -74,9 +76,8 @@ export default ({
     setChroma,
     setTonic,
     width,
-    tonic,
-    notes,
     scorenotes,
+    highlightedNotes,
     onClick,
     minOct = 1,
     maxOct = 9
@@ -92,6 +93,7 @@ export default ({
     width = width || "100%";
 
     const index = circleIndex(setTonic, true);
+    const highlight = stepColor(index, false, 30);
     const color = stepColor(index, false);
     const bgColor = stepColor(index, false, 80);
 
@@ -111,6 +113,10 @@ export default ({
       .piano-key.black.tonic {
         fill: ${color};
       }
+
+      .piano-key.highlight {
+        fill: ${highlight} !important;
+      }
     `;
     return (
         <div className={"Piano " + className}>
@@ -129,6 +135,7 @@ export default ({
                             x={i * 7 * WHITE_WIDTH - (5 * WHITE_WIDTH)}
                             pcset={pcset}
                             scorenotes={scorenotes}
+                            highlightedNotes={highlightedNotes}
                             onClick={onClick || (() => { })}
                         />
                     ))}

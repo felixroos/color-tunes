@@ -15,6 +15,10 @@ class Score extends PureComponent {
         this.updateCanvas();
     }
 
+    isHighlighted(note) {
+        return this.props.highlightedNotes && this.props.highlightedNotes.includes(note);
+    }
+
     updateCanvas() {
         if (window.Vex === undefined) {
             setTimeout(() => this.updateCanvas(), 500);
@@ -47,13 +51,15 @@ class Score extends PureComponent {
             Formatter.FormatAndDraw(
                 ctx,
                 stave,
-                this.props.notes.map(function (n) {
+                this.props.notes.map((n) => {
                     const { letter, acc, oct } = Note.props(n);
                     const note = new Vex.Flow.StaveNote({
                         keys: [letter + "/" + oct],
                         duration: "q",
                         clef
                     });
+                    if (this.isHighlighted(n))
+                        note.setStyle({ fillStyle: this.props.highlightColor || 'tomato' });
                     if (acc) note.addAccidental(0, new Vex.Flow.Accidental(acc));
                     return note;
                 })

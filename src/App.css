@@ -60,3 +60,19 @@ li>strong, li>span {
 .Header .Navigation a {
     margin-right: 1rem;
 }
+
+.randomizer {
+    display: flex;
+}
+
+.options li {
+    display: block !important;
+}
+
+.option-container {
+    min-width: 60px;
+}
+
+.randomizer {
+    overflow: auto;
+}

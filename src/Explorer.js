@@ -8,6 +8,7 @@ import { getProps, newTonicState, parallelSymbols } from './components/Chroma';
 import { circleIndex, CircleSet } from './components/CircleSet';
 import { stepColor } from './components/Colorizer';
 import Material from './components/Material';
+import Permutator from './components/Permutator';
 import Pianist from './components/Pianist';
 import PianoKeyboard from './components/PianoKeyboard';
 import Scales from './components/Scales';
@@ -24,11 +25,11 @@ export default class Explorer extends React.Component {
         const group = this.defaultGroup;
         this.state = {
             circle: 'fourths',
-            tonic: randomItem(this.chromatics),
-            //tonic: 'C',
+            //tonic: randomItem(this.chromatics),
+            tonic: 'C',
             octave: 3,
-            // scale: 'major',
-            scale: !isChord ? randomScale(group) : null,
+             scale: 'major',
+            //scale: !isChord ? randomScale(group) : null,
             chord: isChord ? randomChord(group) : null,
             history: [],
             extended: true,
@@ -36,14 +37,15 @@ export default class Explorer extends React.Component {
             ordered: true,
             fixedTonic: false,
             fixedOctave: false,
-            tonicFirst: false,
             tonicLast: false,
             tonicInBass: false,
             arpeggiate: true,
             invert: 0,
             order: undefined,
-            autoplay: true,
+            showSteps: true,
+            autoplay: false,
             items: [],
+            highlightedNotes: [],
             group,
             pianist: null
         };
@@ -55,27 +57,25 @@ export default class Explorer extends React.Component {
         this.autoplay();
     }
 
+    highlight(highlightedNotes) {
+        this.setState({ highlightedNotes })
+    }
+
+    unhighlight(notes) {
+        const highlightedNotes = this.state.highlightedNotes
+            .filter(note => notes.includes(note));
+        this.setState({ highlightedNotes })
+    }
+
     positionIndex(order, i, position) {
         order[order.indexOf(i)] = order[position];
         order[position] = i;
         return order;
     }
 
-    insertTonic(order, notes) {
-        if (this.state.tonicFirst) { // move tonic to 0
-            order = this.positionIndex(order, 0, 0);
-        }
-        order = order.slice(0, notes.length);
-        if (this.state.tonicLast) {
-            order = this.positionIndex(order, 0, order.length - 1);
-        }
-        return order;
-    }
-
-    shuffle(notes) {
+    randomized(notes) {
         let props = getProps(Object.assign(this.state, { order: null }));
-        let order = props.notes.map((n, i) => i).sort(() => 1 - 2 * Math.random())
-        order = this.insertTonic(order, notes);
+        let order = [].concat(notes).map((n, i) => props.notes.indexOf(n));
         this.setState({ order });
         this.autoplay();
     }
@@ -89,7 +89,6 @@ export default class Explorer extends React.Component {
             return;
         }
         order = order.slice(0, order.length - 1);
-        /* order = this.insertTonic(order, scorenotes); */
         this.setState({ order });
         this.autoplay();
     }
@@ -116,7 +115,6 @@ export default class Explorer extends React.Component {
             return;
         }
         order = this.fillIndices(order, scorenotes.length + 1);
-        /* order = this.insertTonic(order, order); */
         this.setState({ order });
         this.autoplay();
     }
@@ -249,6 +247,34 @@ export default class Explorer extends React.Component {
         label = <h2>{props.label}</h2>;
         const order = props.notes.map(note => Note.props(note).chroma);
 
+        const tonicIndex = circleIndex(Note.chroma(props.tonic), true);
+        const color = stepColor(tonicIndex, false);
+        const bgColor = stepColor(tonicIndex, false, 80);
+        const highlight = stepColor(tonicIndex, false, 30);
+        const style = `
+        li.active {
+            background: ${color};
+        }
+        
+        li.sub {
+            background: ${bgColor};
+        }
+        
+        li.super {
+            background: #eee;
+        }
+        
+        li.parallel {
+            border: 1px solid ${highlight};
+        }
+
+        li.highlight {
+            background: ${highlight} !important;
+        }
+        `;
+
+
+
         circle = (<CircleSet
             size="350"
             chroma={props.chroma}
@@ -260,16 +286,19 @@ export default class Explorer extends React.Component {
             flip={this.state.circle === 'fifths'}
             chromatic={this.state.circle === 'chromatics'}
         />);
-        score = <Score notes={props.scorenotes} />;
+        score = <Score
+            notes={props.scorenotes}
+            highlightedNotes={this.state.highlightedNotes}
+            highlightColor={color} />;
         piano = (<PianoKeyboard
             width="100%"
+            highlightedNotes={this.state.highlightedNotes}
             setChroma={props.chroma}
             setTonic={Note.chroma(props.tonic)}
             onClick={(key) => this.pressedPianoKey(key)}
             notes={props.notes}
             scorenotes={props.scorenotes}
         />);
-
         const circles = ['fourths', 'fifths', 'chromatics'].map((circle, index) => {
             return <li key={index} className={this.state.circle === circle ? 'active' : ''} onClick={() => this.setState({ circle })}>{circle}</li>
         });
@@ -294,27 +323,6 @@ export default class Explorer extends React.Component {
             views = views.reverse();
         }
 
-        const tonicIndex = circleIndex(Note.chroma(props.tonic), true);
-
-        const color = stepColor(tonicIndex, false);
-        const bgColor = stepColor(tonicIndex, false, 80);
-        const style = `
-        li.active {
-            background: ${color};
-        }
-        
-        li.sub {
-            background: ${bgColor};
-        }
-        
-        li.super {
-            background: #eee;
-        }
-        
-        li.parallel {
-            border: 1px solid ${color};
-        }
-        `;
 
         // TODO: preview chord/scale on hover in circle (under current)
         return (
@@ -330,16 +338,30 @@ export default class Explorer extends React.Component {
                     {!this.state.hideCircle ? circle : ''}
 
                     <h5>Permutator</h5>
+                    <Permutator
+                        invert={this.state.invert}
+                        tonic={props.tonic}
+                        fixedChroma={this.state.fixedChroma}
+                        notes={props.scorenotes}
+                        options={props.options}
+                        showSteps={this.state.showSteps}
+                        highlightedNotes={this.state.highlightedNotes}
+                        onRandom={(random) => this.randomized(random)}
+                    />
+
                     <ul className="scroll">
                         {/* <li>
                             <a onClick={() => this.setState(this.state.oldState)}>back</a>
                         </li> */}
+                        <li className={this.state.showSteps ? 'active' : ''} onClick={() => { this.setState({ showSteps: !this.state.showSteps }); }}>steps</li>
+                        <li className={!this.state.showSteps ? 'active' : ''} onClick={() => { this.setState({ showSteps: !this.state.showSteps }); }}>intervals</li>
+
                         <li onClick={() => this.invert(props.notes)} className={this.state.invert > 0 ? 'active' : ''}>
                             inversion {this.state.invert || ''}
                         </li>
-                        <li onClick={() => this.shuffle(props.notes)} className={this.state.order ? 'active' : ''}>
+                        {/* <li onClick={() => this.shuffle(props.notes)} className={this.state.order ? 'active' : ''}>
                             shuffle {this.state.order ? this.state.order.length : ''}
-                        </li>
+                        </li> */}
                         <li onClick={() => this.setState({ order: null, invert: 0 })} className={this.state.order || this.state.invert > 0 ? 'parallel' : ''}>
                             clear
                         </li>
@@ -349,8 +371,6 @@ export default class Explorer extends React.Component {
                         <li onClick={() => this.addNote(props.scorenotes)}>
                             +note
                         </li>
-                        <li className={this.state.tonicFirst ? 'active' : ''} onClick={() => { this.setState({ tonicFirst: !this.state.tonicFirst, tonicLast: false }); this.shuffle(props.notes) }}>tonicFirst</li>
-                        <li className={this.state.tonicLast ? 'active' : ''} onClick={() => { this.setState({ tonicLast: !this.state.tonicLast, tonicFirst: false }); this.shuffle(props.notes) }}>tonicLast</li>
                     </ul>
                     <h5>Composer</h5>
                     <ul className="scroll">
@@ -368,7 +388,7 @@ export default class Explorer extends React.Component {
                     </ul>
                     <h5>Pianist</h5>
                     <ul className="scroll">
-                        <li><Pianist notes={props.scorenotes} onMounted={(pianist) => this.setState({ pianist })} autoplay={this.state.autoplay} overlap={this.state.overlap} harmonic={!this.state.arpeggiate} /></li>{/* <!-- !!props.chord &&  --> */}
+                        <li><Pianist onTrigger={(indices) => this.highlight(indices.map(i => props.scorenotes[i]))} onStop={indices => this.unhighlight(indices.map(i => props.scorenotes[i]))} notes={props.scorenotes} onMounted={(pianist) => this.setState({ pianist })} autoplay={this.state.autoplay} overlap={this.state.overlap} harmonic={!this.state.arpeggiate} /></li>{/* <!-- !!props.chord &&  --> */}
                         <li className={this.state.autoplay ? 'active' : ''} onClick={() => this.setState({ autoplay: !this.state.autoplay })}>autoplay</li>
                         <li className={this.state.fixedOctave ? 'active' : ''} onClick={() => this.setState({ fixedOctave: !this.state.fixedOctave })}>fixedOctave</li>
                         <li className={this.state.tonicInBass ? 'active' : ''} onClick={() => this.setState({ tonicInBass: !this.state.tonicInBass })}>tonicInBass</li>

@@ -59,6 +59,17 @@ export default class Pianist extends React.Component {
         return Promise.all(sources.filter(source => !!source).map(source => this.loadSource(source, context)));
     }
 
+    onTrigger(indices) {
+        if (this.props.onTrigger) {
+            this.props.onTrigger(indices);
+        }
+    }
+    onStop(indices) {
+        if (this.props.onStop) {
+            this.props.onStop(indices);
+        }
+    }
+
     // plays the given notes at the given interval
     playNotes(scorenotes, interval = 0,
         context = new AudioContext(),
@@ -70,14 +81,21 @@ export default class Pianist extends React.Component {
         clock.start();
         this.loadSources(scorenotes.map(note => sounds[Note.props(note).midi - this.midiOffset]), context)
             .then(sounds => {
+                if (interval === 0) {
+                    this.onTrigger(sounds.map((s, i) => i));
+                }
                 sounds.forEach((sound, i) => {
                     if (interval === 0) {
                         sound.start(0);
                     } else {
                         clock.setTimeout((event) => {
+                            this.onTrigger([i]);
                             sound.start(event.deadline);
                         }, interval * i);
                     }
+                    clock.setTimeout(() => {
+                        this.onStop([i]);
+                    }, (interval * i) + sound.buffer.duration);
                 })
             });
     }
@@ -102,7 +120,7 @@ export default class Pianist extends React.Component {
     }
 
     render() {
-       // this.autoplay(); // autoplay on each change
+        // this.autoplay(); // autoplay on each change
         return (
             <div className="player">
                 <a onClick={() => this.play()}>play</a>

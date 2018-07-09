@@ -10,7 +10,7 @@ import * as Scale from 'tonal-scale';
 import { chordNames, scaleNames, symbolName } from './Symbols';
 
 
-const chromatics = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+export const chromatics = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 export function removeOctaves(notes) {
     return notes.map(note => Note.tokenize(note)).map(tokens => tokens[0] + tokens[1]);
 }
@@ -235,19 +235,15 @@ export function getProps(state) {
         label = tonic + symbolName('chord', state.chord);
         subsets = getSubsets(state.chord, false, state.group);
         supersets = getSupersets(state.chord, false, state.group);
-    }/* 
-
-    if (state.invert) {
-        state.invert = state.invert % notes.length;
-        scorenotes = scorenotes.map((note, index) => index < state.invert ? transpose(note, Interval.fromSemitones(12)) : note);
-        scorenotes = TonalArray.rotate(state.invert, scorenotes);
-    } */
+    }
 
     scorenotes = envelopeCut(scorenotes);
     state.octave = Note.props(scorenotes.find(n => Note.pc(n) === tonic)).oct;
     if (state.invert) {
         state.octave -= 1;
     }
+
+    const options = [].concat(scorenotes); // all option notes without order
 
     if (state.order) {
         const order = state.order.filter(i => notes[i]);
@@ -265,7 +261,7 @@ export function getProps(state) {
 
     const parallels = chromaParallels(chroma, state.group);
     return {
-        chord: state.chord, scale: state.scale, tonic, notes, chroma, intervals, scorenotes, label, subsets, supersets, parallels, labels
+        chord: state.chord, scale: state.scale, tonic, notes, chroma, intervals, scorenotes, label, subsets, supersets, parallels, labels, options
     };
 }
 

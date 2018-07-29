@@ -1,6 +1,6 @@
 import React from 'react';
 import Sheet from './Sheet';
-import Player from './Player';
+import Band from './Band';
 import './song.css';
 export default class Song extends React.Component {
   constructor(props) {
@@ -10,14 +10,18 @@ export default class Song extends React.Component {
   selectChord(chord) {
     this.setState({ chord });
   }
+  changedPosition(position) {
+    console.log('position', position, this.sheet);
+    //(position) => this.sheet.setState({ position })
+  }
   render() {
     const song = this.props.data;
     return (
       <div className="song">
         <h1>{song.title}</h1>
         <SongInfo song={song} />
-        <Sheet measures={song.music.measures} onClickChord={(chord) => this.selectChord(chord)} />
-        <Player measures={song.music.measures} chord={this.state.chord} />
+        <Sheet measures={song.music.measures} position={this.state.position} onClickChord={(chord) => this.selectChord(chord)} />
+        <Band measures={song.music.measures} onChangePosition={(position) => this.setState({ position })} />
       </div>
     );
   }

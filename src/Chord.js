@@ -13,13 +13,14 @@ export default class Chord extends React.Component {
       };
       return (<div className="color-bar" style={style} key={index} />);
     });
+    const activeClass = this.props.highlight ? ' is-active' : '';
     return (
       <div
-        className="chord"
+        className={'chord' + activeClass}
         onClick={() => this.props.onClick(this.props.chord)}
       >
-        {colors}
-        <span className="chord-name">{readableChord(this.props.chord)}</span>
+        {/* colors */}
+        <span className={'chord-name' + activeClass}>{readableChord(this.props.chord)}</span>
       </div>
     );
   }

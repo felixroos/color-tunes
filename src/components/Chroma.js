@@ -161,7 +161,7 @@ export function envelopeDistance(a, b) {
     return [Note.midi(a[0]) - Note.midi(b[0]), Note.midi(a[1]) - Note.midi(b[1])];
 }
 
-export function envelopeCut(scorenotes, envelope = ['A2', 'C5']) {
+export function envelopeCut(scorenotes, envelope = ['C3', 'C6']) {
     // lowest and highest note
     const minMax = getEnvelope(scorenotes);
     // transposes all notes octave up / down when outside maxEnvelope
@@ -210,6 +210,9 @@ export function getProps(state) {
     if (!state.scale && !state.chord) {
         return;
     }
+    state = Object.assign({
+        octave: 3
+    }, state);
 
     const fullTonic = state.tonic + state.octave;
 
@@ -236,7 +239,6 @@ export function getProps(state) {
         subsets = getSubsets(state.chord, false, state.group);
         supersets = getSupersets(state.chord, false, state.group);
     }
-
     scorenotes = envelopeCut(scorenotes);
     state.octave = Note.props(scorenotes.find(n => Note.pc(n) === tonic)).oct;
     if (state.invert) {
@@ -244,11 +246,13 @@ export function getProps(state) {
     }
 
     const options = [].concat(scorenotes); // all option notes without order
-
+    if (state.order === true) {
+        state.order = notes.map((n, i) => i);
+    }
     if (state.order) {
-        const order = state.order.filter(i => notes[i]);
-        notes = order.map(i => notes[i]);
-        scorenotes = order.map(i => scorenotes[i]);
+        const noteOrder = state.order.filter(i => notes[i]);
+        notes = noteOrder.map(i => notes[i]);
+        scorenotes = noteOrder.map(i => scorenotes[i]);
     }
 
     if (state.invert) {
@@ -259,9 +263,10 @@ export function getProps(state) {
 
     const labels = getChromaticLabels(notes);
 
+    const order = notes.map(note => Note.props(note).chroma);
     const parallels = chromaParallels(chroma, state.group);
     return {
-        chord: state.chord, scale: state.scale, tonic, notes, chroma, intervals, scorenotes, label, subsets, supersets, parallels, labels, options
+        chord: state.chord, scale: state.scale, tonic, notes, chroma, intervals, scorenotes, label, subsets, supersets, parallels, labels, options, order
     };
 }
 

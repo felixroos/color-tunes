@@ -114,7 +114,7 @@ export default class Randomizer extends React.Component {
     render() {
         const items = this.props.items;
         const current = this.props.current;
-        const defaultItems = this.props.defaultItems;
+        /* const defaultItems = this.props.defaultItems; */
         const length = this.state.length || this.props.length || items.length;
         // slice/fill option length
         let options = (this.state.options || []);

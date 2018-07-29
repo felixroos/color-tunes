@@ -1,6 +1,6 @@
 
 // ripped from https://github.com/danigb/tonal-app/blob/master/src/components/viz/CircleSet.js
-import React from "react";
+import React from 'react';
 import "./CircleSet.css";
 import { stepColor } from './Colorizer';
 

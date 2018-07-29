@@ -7,6 +7,7 @@ class Measure extends React.Component {
   render() {
     const chords = this.props.measure.map((chord, index) => (
       <Chord
+        highlight={this.props.highlight === index}
         chord={chord}
         key={index}
         onClick={() => this.props.onClickChord(chord)}
@@ -50,8 +51,14 @@ export default class Sheet extends React.Component {
         return matchChordScales(...brothers);
       });
     });
+    const position = this.props.position || [-1, -1];
     const bars = measures.map((measure, index) => {
-      return <Measure measure={measure} harmony={harmony[index]} key={index} onClickChord={(chord) => this.props.onClickChord(chord)} />;
+      return <Measure
+        highlight={position[0] === index ? position[1] : false}
+        measure={measure}
+        harmony={harmony[index]}
+        key={index}
+        onClickChord={(chord) => this.props.onClickChord(chord)} />;
     });
     return <div className="sheet">{bars}</div>;
   }

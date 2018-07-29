@@ -1,6 +1,6 @@
 // ripped from https://github.com/danigb/tonal-app/blob/master/src/components/viz/PianoKeyboard.js
 import cat from "classcat";
-import React from "react";
+import React from 'react';
 import { Array, Note } from "tonal";
 import { circleIndex } from "./CircleSet";
 import { stepColor } from './Colorizer';
@@ -96,7 +96,6 @@ export default ({
     const highlight = stepColor(index, false, 30);
     const color = stepColor(index, false);
     const bgColor = stepColor(index, false, 80);
-
     const style = `
       .piano-key.active {
         fill: ${bgColor};

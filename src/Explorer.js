@@ -206,7 +206,6 @@ export default class Explorer extends React.Component {
         let piano, circle, label, score = '';
         const props = getProps(this.state);
         label = <h2>{props.label}</h2>;
-        const order = props.notes.map(note => Note.props(note).chroma);
 
         const tonicIndex = circleIndex(Note.chroma(props.tonic), true);
         const color = stepColor(tonicIndex, false);
@@ -237,9 +236,9 @@ export default class Explorer extends React.Component {
 
 
         circle = (<CircleSet
-            size="350"
+            size="250"
             chroma={props.chroma}
-            order={order}
+            order={props.order}
             ordered={this.state.ordered}
             onClick={(note) => this.newTonic(note)}
             origin={props.tonic}

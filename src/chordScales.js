@@ -4,11 +4,13 @@ import * as Scale from 'tonal-scale';
 import * as PcSet from 'tonal-pcset';
 
 export function getTonalChord(chord) {
-    return chord
-        .replace('-', 'm')
+    chord = chord
+        .replace('-', 'm') // TODO: -^ does not work
         .replace('^', 'maj')
         /* .replace('d', 'dim') */
         .replace('h7', 'm7b5');
+    const s = chord.split('/');
+    return s[0];
 }
 
 export const chordScales = name => {
@@ -22,7 +24,7 @@ export const scaleChords = name => {
 };
 
 export function getChromas(root, scales) {
-  return scales.map(scale => PcSet.chroma(Scale.notes(root, scale)));
+    return scales.map(scale => PcSet.chroma(Scale.notes(root, scale)));
 }
 
 export function matchChordScales(...chords) {

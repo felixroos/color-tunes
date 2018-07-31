@@ -5,12 +5,13 @@ import * as PcSet from 'tonal-pcset';
 
 export function getTonalChord(chord) {
     chord = chord
-        .replace('-', 'm') // TODO: -^ does not work
-        .replace('^', 'maj')
+        .replace('-', 'm')
+        .replace('^', 'M')
         /* .replace('d', 'dim') */
         .replace('h7', 'm7b5');
-    const s = chord.split('/');
-    return s[0];
+    const tokens = Chord.tokenize(chord);
+    const s = tokens[1].split('/');
+    return tokens[0] + (s[0] || 'M');
 }
 
 export const chordScales = name => {

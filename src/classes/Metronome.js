@@ -8,7 +8,6 @@ export class Metronome {
     ) {
         this.bpm = bpm;
         this.cycle = cycle;
-        this.tick = 0;
         this.context = new AudioContext();
         this.clock = new WAAClock(this.context, { toleranceEarly: 0.1, toleranceLate: 0.1 });
     }
@@ -54,12 +53,7 @@ export class Metronome {
         this.clock.start();
     }
 
-    pause() {
-        this.clock.stop();
-    }
-
     stop() {
         this.clock.stop();
-        this.tick = 0;
     }
 }

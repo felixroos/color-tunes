@@ -19,6 +19,8 @@ import './Explorer.css';
 export default class Explorer extends React.Component {
     chromatics = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
     defaultGroup = 'Advanced';
+    pianist = new Pianist();
+
     constructor() {
         super();
         const isChord = Math.random() > 0.5;
@@ -46,8 +48,7 @@ export default class Explorer extends React.Component {
             autoplay: false,
             items: [],
             highlightedNotes: [],
-            group,
-            pianist: null
+            group
         };
     }
 
@@ -193,12 +194,10 @@ export default class Explorer extends React.Component {
     }
     /** Calls play if autoplay is set to true */
     autoplay() {
-        if (this.state.autoplay && this.state.pianist) {
+        if (this.state.autoplay) {
             setTimeout(() => {
-                this.state.pianist.play();
+                this.pianist.play();
             })
-        } else if (!this.state.pianist) {
-            console.log('no pianist found :(');
         }
     }
 
@@ -342,7 +341,7 @@ export default class Explorer extends React.Component {
                     </ul>
                     <h5>Pianist</h5>
                     <ul className="scroll">
-                        <li><Pianist onTrigger={(indices) => this.highlight(indices.map(i => props.scorenotes[i]))} onStop={indices => this.unhighlight(indices.map(i => props.scorenotes[i]))} notes={props.scorenotes} onMounted={(pianist) => this.setState({ pianist })} autoplay={this.state.autoplay} overlap={this.state.overlap} harmonic={!this.state.arpeggiate} /></li>{/* <!-- !!props.chord &&  --> */}
+                        <li onClick={() => this.pianist.playNotes(props.scorenotes)}>play</li>
                         <li className={this.state.autoplay ? 'active' : ''} onClick={() => this.setState({ autoplay: !this.state.autoplay })}>autoplay</li>
                         <li className={this.state.fixedOctave ? 'active' : ''} onClick={() => this.setState({ fixedOctave: !this.state.fixedOctave })}>fixedOctave</li>
                         <li className={this.state.tonicInBass ? 'active' : ''} onClick={() => this.setState({ tonicInBass: !this.state.tonicInBass })}>tonicInBass</li>

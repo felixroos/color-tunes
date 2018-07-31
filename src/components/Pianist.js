@@ -5,14 +5,12 @@ import { Soundbank } from '../classes/Soundbank.js';
 
 // TODO: remove react stuff => DOM = async
 
-export default class Pianist extends React.Component {
+export default class Pianist/*  extends React.Component */ {
     ctx;
     midiOffset = 36;
-    constructor() {
-        super();
-        this.state = {
-            notes: []
-        };
+    constructor(props = { bpm: 200 }) {
+        this.props = props;
+        /* super(); */
         this.soundbank = new Soundbank({
             onTrigger: (indices) => {
                 if (this.props.onTrigger) {
@@ -26,11 +24,11 @@ export default class Pianist extends React.Component {
         });
     }
 
-    componentDidMount() {
+    /* componentDidMount() {
         if (this.props.onMounted) {
             this.props.onMounted(this)
         }
-    }
+    } */
 
     // plays the given notes at the given interval
     playNotes(scorenotes, deadline = 0, interval = 0) {

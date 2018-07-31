@@ -9,6 +9,9 @@ import Pianist from './components/Pianist.js';
 import { Metronome } from './classes/Metronome.js';
 
 export default class Player extends React.Component {
+  metronome = new Metronome(200);
+  pianist = new Pianist();
+
   constructor() {
     super();
     this.state = {
@@ -25,10 +28,8 @@ export default class Player extends React.Component {
     const chord = measures[position[0]][position[1]];
     const chordTokens = Chord.tokenize(getTonalChord(chord));
     const props = getProps({ tonic: chordTokens[0], chord: chordTokens[1], order: true });
-    if (this.state.pianist && props) {
-      this.state.pianist.playNotes(props.scorenotes, deadline, 0);
-    } else {
-      console.log('pianist not found..');
+    if (props) {
+      this.pianist.playNotes(props.scorenotes, deadline, 0);
     }
     this.setState({ position, chord });
     if (this.props.onChangePosition) {
@@ -37,17 +38,10 @@ export default class Player extends React.Component {
   }
 
   playTune(measures = this.props.measures, position = this.state.position || [0, 0]) {
-    if (!this.metronome) {
-      this.metronome = new Metronome(200);
-    }
     this.metronome.start();
     this.metronome.tickArray(measures, (tick) => {
       this.playPosition(tick.item.path, tick.event.deadline, measures);
     }, 2);
-  }
-
-  stopTune() {
-    this.metronome.stop();
   }
 
   getNextPosition(position = this.state.position, measures = this.props.measures) {
@@ -80,11 +74,23 @@ export default class Player extends React.Component {
   }
 
   render() {
-    let piano, pianist, circle, label; //, score = '';
+    let piano, circle, label; //, score = '';
     const chord = this.props.chord || this.state.chord;
     if (chord) {
       const chordTokens = Chord.tokenize(getTonalChord(chord));
       const props = getProps({ tonic: chordTokens[0], chord: chordTokens[1], order: true });
+      if (!props) {
+        console.log('no props...');
+        return null;
+      }
+      circle = (<CircleSet
+        size="250"
+        chroma={props.chroma}
+        order={props.order}
+        ordered={true}
+        origin={props.tonic}
+        labels={props.labels}
+      />);
 
       piano = (<PianoKeyboard
         width="100%"
@@ -95,39 +101,25 @@ export default class Player extends React.Component {
         highlightedNotes={this.state.highlightedNotes}
       />);
 
-      circle = (<CircleSet
-        size="250"
-        chroma={props.chroma}
-        order={props.order}
-        ordered={true}
-        origin={props.tonic}
-        labels={props.labels}
-      />);
-
-      pianist =
-        <Pianist
-          onTrigger={(indices) => this.highlight(indices.map(i => props.scorenotes[i]))}
-          onStop={indices => this.unhighlight(indices.map(i => props.scorenotes[i]))}
-          notes={props.scorenotes}
-          onMounted={(pianist) => this.setState({ pianist })}
-          autoplay={this.state.autoplay} overlap={this.state.overlap}
-          harmonic={!this.state.arpeggiate} />;
     }
 
     return (
       <div className="player">
-        <a onClick={() => this.playNextChord()}>next chord</a>
-        <a onClick={() => this.playTune()}>play</a>
-        <a onClick={() => this.stopTune()}>stop</a>
+        <ul>
+          <li>
+            <a onClick={() => this.playTune()}>play</a>
+          </li>
+          <li>
+            <a onClick={() => this.metronome.stop()}>stop</a>
+          </li>
+          <li>
+            <a onClick={() => this.playNextChord()}>next chord</a>
+          </li>
+        </ul>
         {piano}
         {label}
         {circle}
         {/* score */}
-        <ul>
-          <li>
-            {pianist}
-          </li>
-        </ul>
       </div >
     );
   }

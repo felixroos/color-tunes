@@ -19,7 +19,7 @@ export default class Chord extends React.Component {
         className={'chord' + activeClass}
         onClick={() => this.props.onClick(this.props.chord)}
       >
-        {/* colors */}
+        {colors}
         <span className={'chord-name' + activeClass}>{readableChord(this.props.chord)}</span>
       </div>
     );

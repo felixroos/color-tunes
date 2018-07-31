@@ -3,7 +3,7 @@ ul {
     /* border-top: 1px solid #ccc; */
 }
 
-.explorer li {
+.explorer li, .song li {
     list-style: none;
     display: inline-block;
     min-width: 60px;

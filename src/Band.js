@@ -10,7 +10,14 @@ import { Metronome } from './classes/Metronome.js';
 
 export default class Player extends React.Component {
   metronome = new Metronome(200);
-  pianist = new Pianist();
+  pianist = new Pianist({
+    onTrigger: (activeNotes) => {
+      this.setState({ activeNotes });
+    },
+    /* onStop: (notes) => {
+      console.log('stop', notes);
+    } */
+  });
 
   constructor() {
     super();
@@ -20,7 +27,8 @@ export default class Player extends React.Component {
       arpeggiate: true,
       overlap: false,
       autoplay: true,
-      position: null
+      position: null,
+      activeNotes: null
     };
   }
 
@@ -80,8 +88,11 @@ export default class Player extends React.Component {
       const chordTokens = Chord.tokenize(getTonalChord(chord));
       const props = getProps({ tonic: chordTokens[0], chord: chordTokens[1], order: true });
       if (!props) {
-        console.log('no props...');
+        console.warn('invalid chord..');
         return null;
+      }
+      if (this.state.activeNotes) {
+        props.order = this.state.activeNotes.map(note => Note.chroma(note)) || props.order;
       }
       circle = (<CircleSet
         size="250"
@@ -97,7 +108,7 @@ export default class Player extends React.Component {
         setChroma={props.chroma}
         setTonic={Note.chroma(props.tonic)}
         notes={props.notes}
-        scorenotes={props.scorenotes}
+        scorenotes={this.state.activeNotes || []}
         highlightedNotes={this.state.highlightedNotes}
       />);
 

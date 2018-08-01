@@ -19,7 +19,7 @@ import './Explorer.css';
 export default class Explorer extends React.Component {
     chromatics = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
     defaultGroup = 'Advanced';
-    pianist = new Pianist();
+    pianist = new Pianist({ intelligentVoicings: false });
 
     constructor() {
         super();
@@ -196,8 +196,9 @@ export default class Explorer extends React.Component {
     autoplay() {
         if (this.state.autoplay) {
             setTimeout(() => {
-                this.pianist.play();
-            })
+                const props = getProps(this.state);
+                this.pianist.playNotes(props.scorenotes);
+            },200)
         }
     }
 

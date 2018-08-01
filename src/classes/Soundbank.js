@@ -80,21 +80,21 @@ export class Soundbank {
             this.clock.start();
         }
 
-        /* if (interval === 0) {
+        if (interval === 0) {
             this.trigger(sounds.map((s, i) => i));
-        } */
+        }
         sounds.forEach((sound, i) => {
             if (interval === 0) {
                 sound.start(deadline);
             } else {
                 this.clock.setTimeout((event) => {
-                    // this.trigger([i]);
+                    this.trigger([i]);
                     sound.start(event.deadline);
                 }, interval * i);
             }
-            /* this.clock.setTimeout(() => {
+            this.clock.setTimeout(() => {
                 this.stop([i]);
-            }, (interval * i) + sound.buffer.duration); */
+            }, (interval * i) + sound.buffer.duration);
         })
     }
 

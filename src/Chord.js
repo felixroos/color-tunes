@@ -13,6 +13,7 @@ export default class Chord extends React.Component {
       };
       return (<div className="color-bar" style={style} key={index} />);
     });
+
     const activeClass = this.props.highlight ? ' is-active' : '';
     return (
       <div

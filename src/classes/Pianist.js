@@ -1,12 +1,12 @@
 import * as Note from 'tonal-note';
 // import * as TonalArray from 'tonal-array';
 import { sounds } from '../assets/sounds/sounds.js';
-import { Soundbank } from './Soundbank';
+import { Soundbank } from './Soundbank.js';
 import { Interval } from 'tonal';
 import { Distance } from 'tonal';
 import { Chord } from 'tonal';
-import { getTonalChord } from '../../chordScales.js';
-import { randomElement, getOne } from '../dist/util.js';
+import { getTonalChord } from '../chordScales.js';
+import { randomElement, getOne } from './util.js';
 export default class Pianist {
     ctx;
     midiOffset = 36;
@@ -19,7 +19,7 @@ export default class Pianist {
         'Medium Swing': [{
             pattern: (p, n) => {
                 const latest = this.playedPatterns[this.playedPatterns.length - 1];
-                const off = (n) => randomElement([0, [0, 0, n]], [6, 1]);
+                const off = (n) => randomElement([0, [0, 0, n]], [3, 1]);
                 const one = () => getOne(latest);
                 const t = `${p.cycle}/${n}`;
                 const o = one();
@@ -53,8 +53,6 @@ export default class Pianist {
         }]
     };
     style = 'Medium Swing';
-    props: any;
-    soundbank: any;
 
     constructor(props) {
         this.props = Object.assign({}, this.defaults, props || {});
@@ -160,7 +158,7 @@ export default class Pianist {
     }
 
     // plays the given notes at the given interval
-    playNotes(scorenotes, deadline = 0, interval = 0, tonic?) {
+    playNotes(scorenotes, deadline = 0, interval = 0, tonic) {
         if (!scorenotes || !scorenotes.length) {
             return;
         }
@@ -180,7 +178,7 @@ export default class Pianist {
         chord = Chord.tokenize(getTonalChord(chord));
         const notes = Chord.intervals(chord[1])
             .map(i => i.replace('13', '6'))
-            .map((root => Distance.transpose(chord[0] + '3', root));
+            .map(root => Distance.transpose(chord[0] + '3', root));
         /* .slice(noTonic ? 1 : 0); */
         this.playNotes(notes, deadline);
     }

@@ -14,13 +14,14 @@
     transition: all .1s linear;
 }
 
+.Circle path.ordered {
+    transition: all .2s linear;
+}
+
 .Circle path.interconnections {
     opacity: 0.1;
 }
 
-.Circle path.ordered {
-    transition: all .2s linear;
-}
 
 /* 
 @keyframes dashdraw {

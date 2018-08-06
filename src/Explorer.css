@@ -33,9 +33,9 @@ ul {
     width: 100%;
 }
 
-.Circle {
+/* .Circle {
     width: 100%;
-}
+} */
 
 h5 {
     margin: 0;
@@ -73,13 +73,9 @@ li.parallel {
 
 canvas, .Piano {
     width: 100%;
-    max-width: 900px;
-    margin: 0 auto;
 }
 
 .score {
-    width: 100%;
-    margin: auto;
     max-width: 500px;
     position: relative;
 }

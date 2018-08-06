@@ -9,7 +9,7 @@ import { circleIndex, CircleSet } from './components/CircleSet';
 import { stepColor } from './components/Colorizer';
 import Material from './components/Material';
 import Permutator from './components/Permutator';
-import Pianist from './components/Pianist';
+import Pianist from './classes/Pianist.js';
 import PianoKeyboard from './components/PianoKeyboard';
 import Scales from './components/Scales';
 import Score from './components/Score';
@@ -198,7 +198,7 @@ export default class Explorer extends React.Component {
             setTimeout(() => {
                 const props = getProps(this.state);
                 this.pianist.playNotes(props.scorenotes);
-            },200)
+            }, 50)
         }
     }
 
@@ -237,6 +237,7 @@ export default class Explorer extends React.Component {
 
         circle = (<CircleSet
             size="250"
+            width="100%"
             chroma={props.chroma}
             order={props.order}
             ordered={this.state.ordered}
@@ -292,8 +293,8 @@ export default class Explorer extends React.Component {
                 </style>
                 <div className="symbols">
                     {label}
-                    {!this.state.hidePiano ? piano : ''}
                     {!this.state.hideScore ? score : ''}
+                    {!this.state.hidePiano ? piano : ''}
 
                     {!this.state.hideCircle ? circle : ''}
 

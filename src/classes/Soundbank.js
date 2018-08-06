@@ -2,12 +2,15 @@ import * as WAAClock from 'waaclock';
 
 export class Soundbank {
     buffers = {};
-    constructor(options) {
+    constructor(options = {}) {
         this.onTrigger = options.onTrigger || (() => { });
         this.onStop = options.onStop || (() => { });
         this.context = new AudioContext();
         this.overlap = options.overlap;
         this.clock = new WAAClock(this.context, { toleranceEarly: 0.1, toleranceLate: 0.1 });
+        if (options.preload) {
+            this.preload = this.loadSources(options.preload)
+        }
     }
 
     trigger(indices) {

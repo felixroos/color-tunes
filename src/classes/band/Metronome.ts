@@ -1,5 +1,5 @@
 
-import { Soundbank } from './Soundbank';
+import { Soundbank } from '../dist/Soundbank';
 import * as metronomeUp from '../assets/MetronomeUp.wav';
 
 export class Metronome {

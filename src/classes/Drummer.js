@@ -1,10 +1,10 @@
 
-import { Soundbank } from '../dist/Soundbank.js';
+import { Soundbank } from './Soundbank.js';
 import * as kick from '../assets/drummer/kick.wav';
 import * as snare from '../assets/drummer/snare.wav';
 import * as hihat from '../assets/drummer/hihat.wav';
 import * as ride from '../assets/drummer/ride.wav';
-import { randomElement } from '../dist/util.js';
+import { randomElement } from './util.js';
 
 export class Drummer {
 

@@ -7,8 +7,14 @@ export function getTonalChord(chord) {
     chord = chord
         .replace('-', 'm')
         .replace('^', 'M')
-        /* .replace('d', 'dim') */
-        .replace('h7', 'm7b5');
+        .replace('h7', 'm7b5')
+        .replace('h', 'dim');
+        /**
+         * Chords that dont work:
+         * slash cords are ignored
+         * 7b9b5 does not work
+         * 
+         */
     const tokens = Chord.tokenize(chord);
     const s = tokens[1].split('/');
     return tokens[0] + (s[0] || 'M');

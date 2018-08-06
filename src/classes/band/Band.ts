@@ -1,7 +1,7 @@
-import Pianist from './Pianist';
-import { Pulse } from './Pulse';
-import { Metronome } from './Metronome';
-import { Drummer } from './Drummer';
+import Pianist from '../dist/Pianist';
+import { Pulse } from '../dist/Pulse';
+import { Metronome } from '../dist/Metronome';
+import { Drummer } from '../dist/Drummer';
 
 export default class Band {
     styles = {

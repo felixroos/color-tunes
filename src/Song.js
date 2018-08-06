@@ -16,12 +16,13 @@ export default class Song extends React.Component {
   }
   render() {
     const song = this.props.data;
+    // song.music.measures = [['Bb^7'],['G7#5'],['C-7'], ['F7','F#o7'],['G-7'],['F-7']];
     return (
       <div className="song">
         <h1>{song.title}</h1>
         <SongInfo song={song} />
         <Sheet measures={song.music.measures} position={this.state.position} onClickChord={(chord) => this.selectChord(chord)} />
-        <Band measures={song.music.measures} onChangePosition={(position) => this.setState({ position })} />
+        <Band measures={song.music.measures} style={song.style} onChangePosition={(position) => this.setState({ position })} />
       </div>
     );
   }

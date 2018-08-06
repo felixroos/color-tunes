@@ -4,18 +4,11 @@ import { Metronome } from './Metronome';
 import { Drummer } from './Drummer';
 
 export default class Band {
-
-    constructor() {
-        this.props = {
-            chord: null,
-            circle: 'fourths', // fifths, chromatics
-            arpeggiate: true,
-            overlap: false,
-            autoplay: true,
-            position: null,
-            activeNotes: null,
-            context: new AudioContext()
-        };
+    constructor(props = {}) {
+        console.log('props', props);
+        this.props = Object.assign({
+            context: props.context || new AudioContext()
+        }, props);
         const context = this.props.context;
 
         this.styles = {
@@ -37,11 +30,11 @@ export default class Band {
         this.metronome = new Metronome({ context });
         this.drummer = new Drummer({ context });
         this.pianist = new Pianist({ context, itelligentVoicings: false });
-        this.ready = Promise.all([this.pianist.ready, this.drummer.ready, this.metronome.ready]);
+        this.ready = Promise.all([this.resume(), this.pianist.ready, this.drummer.ready, this.metronome.ready]);
     }
-    
+
     resume() { // https://goo.gl/7K7WLu
-        this.props.context.resume();
+        return this.props.context.resume().then(() => this.props.context);
     }
 
     playChordAtPosition(position) {

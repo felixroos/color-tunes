@@ -4,10 +4,8 @@ import metronomeUp from '../assets/MetronomeUp.wav';
 
 export class Metronome {
     constructor(props = {}) {
-        this.soundbank = new Soundbank({ preload: [metronomeUp] });
-        this.soundbank.preload.then((loaded) => {
-            console.log('metronome ready');
-        })
+        this.soundbank = new Soundbank({ preload: [metronomeUp], context: props.context });
+        this.ready = this.soundbank.preload;
     }
     bar(tick) {
         tick.pulse.tickArray([1, 1, 1, 1].slice(0, Math.floor(tick.cycle)), (t) => {

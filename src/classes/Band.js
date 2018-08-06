@@ -13,8 +13,10 @@ export default class Band {
             overlap: false,
             autoplay: true,
             position: null,
-            activeNotes: null
+            activeNotes: null,
+            context: new AudioContext()
         };
+        const context = this.props.context;
 
         this.styles = {
             'Medium Swing': {},
@@ -31,10 +33,15 @@ export default class Band {
             'Funk': {},
         };
         this.defaultStyle = 'Medium Swing';
-        this.pulse = new Pulse({ bpm: 130 });
-        this.metronome = new Metronome();
-        this.drummer = new Drummer();
-        this.pianist = new Pianist({ itelligentVoicings: false });
+        this.pulse = new Pulse({ context, bpm: 130 });
+        this.metronome = new Metronome({ context });
+        this.drummer = new Drummer({ context });
+        this.pianist = new Pianist({ context, itelligentVoicings: false });
+        this.ready = Promise.all([this.pianist.ready, this.drummer.ready, this.metronome.ready]);
+    }
+    
+    resume() { // https://goo.gl/7K7WLu
+        this.props.context.resume();
     }
 
     playChordAtPosition(position) {
@@ -47,7 +54,8 @@ export default class Band {
         this.pulse.props = Object.assign(style);
     }
 
-    playTune(measures = this.props.measures, times = 1, position = this.props.position || [0, 0]) {
+    compBars(measures = this.props.measures, times = 1, position = this.props.position || [0, 0]) {
+        measures = measures.map(m => !Array.isArray(m) ? [m] : m);
         if (times > 1) {
             measures = new Array(times).fill(1).reduce((song) => {
                 return song.concat(measures);

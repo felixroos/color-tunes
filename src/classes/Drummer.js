@@ -41,10 +41,8 @@ export class Drummer {
             ]
         };
         this.style = 'Medium Swing';
-        this.soundbank = new Soundbank({ preload: [kick, snare, hihat, ride] });
-        this.soundbank.preload.then((loaded) => {
-            console.log('drummer ready');
-        })
+        this.soundbank = new Soundbank({ preload: [kick, snare, hihat, ride], context: props.context });
+        this.ready = this.soundbank.preload;
     }
     bar(tick) {
         this.styles[this.style].forEach(track => {

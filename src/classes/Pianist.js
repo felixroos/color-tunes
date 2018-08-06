@@ -9,7 +9,6 @@ import { getTonalChord } from '../chordScales.js';
 import { randomElement, getOne } from './util.js';
 export default class Pianist {
 
-
     constructor(props) {
         this.style = 'Medium Swing';
         this.midiOffset = 36;
@@ -59,6 +58,7 @@ export default class Pianist {
 
         this.props = Object.assign({}, this.defaults, props || {});
         this.soundbank = new Soundbank({
+            context: props.context,
             preload: sounds,
             onTrigger: (indices) => {
                 if (this.props.onTrigger) {
@@ -71,9 +71,7 @@ export default class Pianist {
                 }
             }
         });
-        this.soundbank.preload.then((sounds) => {
-            console.log('pianist ready');
-        })
+        this.ready = this.soundbank.preload;
     }
 
     bar(tick, measures) {

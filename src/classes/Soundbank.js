@@ -1,8 +1,8 @@
-import * as WAAClock from 'waaclock';
+import WAAClock from 'waaclock';
 
 export class Soundbank {
-    buffers = {};
     constructor(options = {}) {
+        this.buffers = {};
         this.onTrigger = options.onTrigger || (() => { });
         this.onStop = options.onStop || (() => { });
         this.context = new AudioContext();
@@ -88,7 +88,7 @@ export class Soundbank {
         }
         sounds.forEach((sound, i) => {
             if (interval === 0) {
-                sound.start(deadline);
+            sound.start(deadline);
             } else {
                 this.clock.setTimeout((event) => {
                     this.trigger([i]);

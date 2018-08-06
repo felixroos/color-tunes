@@ -1,4 +1,4 @@
-import * as WAAClock from 'waaclock';
+import WAAClock from 'waaclock';
 
 export class Soundbank {
     buffers = {};

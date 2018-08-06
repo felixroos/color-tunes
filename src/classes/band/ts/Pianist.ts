@@ -1,10 +1,10 @@
 import * as Note from 'tonal-note';
 import { sounds } from '../../../assets/sounds/sounds.js';
-import { Soundbank } from './Soundbank';
+import { Soundbank } from './Soundbank.js';
 import { Interval } from 'tonal';
 import { Distance } from 'tonal';
 import { Chord } from 'tonal';
-import { getTonalChord, randomElement, getOne } from './util';
+import { getTonalChord, randomElement, getOne } from './util.js';
 export default class Pianist {
     ctx;
     midiOffset = 36;

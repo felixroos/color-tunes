@@ -8,53 +8,55 @@ import { Chord } from 'tonal';
 import { getTonalChord } from '../chordScales.js';
 import { randomElement, getOne } from './util.js';
 export default class Pianist {
-    ctx;
-    midiOffset = 36;
-    playedNotes = [];
-    playedPatterns = [];
-    defaults = { bpm: 200, intelligentVoicings: true };
-    min = Math.min;
-    styles = {
-        'Funk': [{ pattern: (p, n) => [[0, 1], 0, [0, 1], 1] }],
-        'Medium Swing': [{
-            pattern: (p, n) => {
-                const latest = this.playedPatterns[this.playedPatterns.length - 1];
-                const off = (n) => randomElement([0, [0, 0, n]], [3, 1]);
-                const one = () => getOne(latest);
-                const t = `${p.cycle}/${n}`;
-                const o = one();
-                const no = !o ? 1 : 0;
-                if (t === '4/1') {
-                    return randomElement([
-                        [o, 0, 0, off(2)],
-                        [o, 0, no, off(2)],
-                        [o, [0, 0, 1], 0, off(2)],
-                    ]);//, [2, 1, 1]
-                }
-                if (t === '4/2') {
-                    return randomElement([
-                        [o, 0, 2, off(3)],
-                        [o, [0, 0, 2], 0, off(3)],
-                    ], [2, 1]);
-                }
 
-                if (t === '4/3') {
-                    console.log('three..');
-                    return [o, 2, 3];
-                }
-                if ('4/4') {
-                    return randomElement([
-                        [o, 2, 3, 4],
-                        [[o, 0, 2], [0, 0, 3], 0, 4]
-                    ]);
-                }
-
-            }
-        }]
-    };
-    style = 'Medium Swing';
 
     constructor(props) {
+        this.style = 'Medium Swing';
+        this.midiOffset = 36;
+        this.playedNotes = [];
+        this.playedPatterns = [];
+        this.defaults = { bpm: 200, intelligentVoicings: true };
+        this.min = Math.min;
+        this.styles = {
+            'Funk': [{ pattern: (p, n) => [[0, 1], 0, [0, 1], 1] }],
+            'Medium Swing': [{
+                pattern: (p, n) => {
+                    const latest = this.playedPatterns[this.playedPatterns.length - 1];
+                    const off = (n) => randomElement([0, [0, 0, n]], [3, 1]);
+                    const one = () => getOne(latest);
+                    const t = `${p.cycle}/${n}`;
+                    const o = one();
+                    const no = !o ? 1 : 0;
+                    if (t === '4/1') {
+                        return randomElement([
+                            [o, 0, 0, off(2)],
+                            [o, 0, no, off(2)],
+                            [o, [0, 0, 1], 0, off(2)],
+                        ]);//, [2, 1, 1]
+                    }
+                    if (t === '4/2') {
+                        return randomElement([
+                            [o, 0, 2, off(3)],
+                            [o, [0, 0, 2], 0, off(3)],
+                        ], [2, 1]);
+                    }
+
+                    if (t === '4/3') {
+                        console.log('three..');
+                        return [o, 2, 3];
+                    }
+                    if ('4/4') {
+                        return randomElement([
+                            [o, 2, 3, 4],
+                            [[o, 0, 2], [0, 0, 3], 0, 4]
+                        ]);
+                    }
+
+                }
+            }]
+        };
+
+
         this.props = Object.assign({}, this.defaults, props || {});
         this.soundbank = new Soundbank({
             preload: sounds,

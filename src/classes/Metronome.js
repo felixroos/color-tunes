@@ -1,6 +1,6 @@
 
 import { Soundbank } from './Soundbank';
-import * as metronomeUp from '../assets/MetronomeUp.wav';
+import metronomeUp from '../assets/MetronomeUp.wav';
 
 export class Metronome {
     constructor(props = {}) {

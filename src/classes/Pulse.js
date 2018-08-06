@@ -1,13 +1,13 @@
-import * as WAAClock from 'waaclock';
+import WAAClock from 'waaclock';
 
 export class Pulse {
-    defaultProps = {
-        bpm: 90,
-        cycle: 4
-    }
     constructor(
         props
     ) {
+        this.defaultProps = {
+            bpm: 90,
+            cycle: 4
+        }
         this.props = Object.assign({}, this.defaultProps, props);
         this.context = this.props.context || new AudioContext();
         this.clock = this.props.clock || new WAAClock(this.context, { toleranceEarly: 0.1, toleranceLate: 0.1 });

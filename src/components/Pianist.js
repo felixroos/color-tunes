@@ -2,7 +2,7 @@ import * as Distance from 'tonal-distance';
 import * as Note from 'tonal-note';
 import { sounds } from '../assets/sounds/sounds.js';
 import { Soundbank } from '../classes/Soundbank.js';
-import { Interval } from '../../node_modules/tonal';
+import { Interval } from 'tonal';
 
 export default class Pianist {
     ctx;

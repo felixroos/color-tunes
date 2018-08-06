@@ -4,38 +4,31 @@ import { Metronome } from './Metronome';
 import { Drummer } from './Drummer';
 
 export default class Band {
-    styles = {
-        'Medium Swing': {},
-        'Slow Swing': {},
-        'Medium Up Swing': {},
-        'Up Tempo Swing': {},
-        'Bossa Nova': {},
-        'Latin': {},
-        'Waltz': {},
-        'Even 8ths': {},
-        'Afro': {},
-        'Ballad': {},
-        'Rock Pop': {},
-        'Funk': {},
-    };
-    defaultStyle = 'Medium Swing';
-    pulse = new Pulse({ bpm: 130 });
-    metronome = new Metronome();
-    drummer = new Drummer();
-    pianist = new Pianist();
     props: any;
+    defaultStyle: string;
+    pulse: Pulse;
+    metronome: Metronome;
+    drummer: Drummer;
+    pianist: Pianist;
+    constructor(props: any = {}) {
+        this.props = Object.assign({
+            context: props.context || new AudioContext()
+        }, props);
+        const context = this.props.context;
 
+        this.defaultStyle = 'Medium Swing';
+        this.pulse = new Pulse({ context, bpm: 130 });
+        this.metronome = new Metronome({ context });
+        this.drummer = new Drummer({ context });
+        this.pianist = new Pianist({ context, itelligentVoicings: false });
+    }
 
-    constructor() {
-        this.props = {
-            chord: null,
-            circle: 'fourths', // fifths, chromatics
-            arpeggiate: true,
-            overlap: false,
-            autoplay: true,
-            position: null,
-            activeNotes: null
-        };
+    ready() {
+        return Promise.all([this.resume(), this.pianist.ready, this.drummer.ready, this.metronome.ready]);
+    }
+
+    resume() { // https://goo.gl/7K7WLu
+        return this.props.context.resume().then(() => this.props.context);
     }
 
     playChordAtPosition(position) {
@@ -43,16 +36,21 @@ export default class Band {
         this.pianist.playChord(chord);
     }
 
-    applyStyle(styleName) {
+    /* applyStyle(styleName) {
         const style = this.styles[styleName] || this.styles[this.defaultStyle];
         this.pulse.props = Object.assign(style);
-    }
+    } */
 
-    playTune(measures = this.props.measures, position = this.props.position || [0, 0]) {
+    compBars(measures = this.props.measures, times = 1, position = this.props.position || [0, 0]) {
+        measures = measures.map(m => !Array.isArray(m) ? [m] : m);
+        if (times > 1) {
+            measures = new Array(times).fill(1).reduce((song) => {
+                return song.concat(measures);
+            }, []);
+        }
         this.pulse.tickArray(measures.map(m => 1), (tick) => {
             this.drummer.bar(tick);
             this.pianist.bar(tick, measures);
-            // this.metronome.bar(tick);
         });
         this.pulse.start();
     }

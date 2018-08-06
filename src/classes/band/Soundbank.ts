@@ -11,7 +11,7 @@ export class Soundbank {
     constructor(options: any = {}) {
         this.onTrigger = options.onTrigger || (() => { });
         this.onStop = options.onStop || (() => { });
-        this.context = new AudioContext();
+        this.context = options.context || new AudioContext();
         this.overlap = options.overlap;
         this.clock = new WAAClock(this.context, { toleranceEarly: 0.1, toleranceLate: 0.1 });
         if (options.preload) {

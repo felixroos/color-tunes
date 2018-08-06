@@ -1,12 +1,12 @@
 import * as Note from 'tonal-note';
-import { sounds } from '../../../assets/sounds/sounds.js';
-import { Soundbank } from './Soundbank.js';
+import { sounds } from './samples/piano';
+import { Soundbank } from './Soundbank';
 import { Interval } from 'tonal';
 import { Distance } from 'tonal';
 import { Chord } from 'tonal';
-import { getTonalChord, randomElement, getOne } from './util.js';
+import { getTonalChord, randomElement, getOne } from './util';
 export default class Pianist {
-    ctx;
+    style = 'Medium Swing';
     midiOffset = 36;
     playedNotes = [];
     playedPatterns = [];
@@ -17,7 +17,7 @@ export default class Pianist {
         'Medium Swing': [{
             pattern: (p, n) => {
                 const latest = this.playedPatterns[this.playedPatterns.length - 1];
-                const off = (n) => randomElement([0, [0, 0, n]], [6, 1]);
+                const off = (n) => randomElement([0, [0, 0, n]], [3, 1]);
                 const one = () => getOne(latest);
                 const t = `${p.cycle}/${n}`;
                 const o = one();
@@ -50,13 +50,13 @@ export default class Pianist {
             }
         }]
     };
-    style = 'Medium Swing';
+    soundbank: Soundbank;
     props: any;
-    soundbank: any;
-
-    constructor(props = {}) {
+    ready: Promise<any[]>;
+    constructor(props: any = {}) {
         this.props = Object.assign({}, this.defaults, props || {});
         this.soundbank = new Soundbank({
+            context: props.context,
             preload: sounds,
             onTrigger: (indices) => {
                 if (this.props.onTrigger) {
@@ -69,9 +69,7 @@ export default class Pianist {
                 }
             }
         });
-        this.soundbank.preload.then((sounds) => {
-            console.log('pianist ready');
-        })
+        this.ready = this.soundbank.preload;
     }
 
     bar(tick, measures) {
@@ -136,7 +134,7 @@ export default class Pianist {
         return Note.props(note).midi - this.midiOffset;
     }
 
-    getVoicing(scorenotes, before, tonic) {
+    getVoicing(scorenotes, before, tonic?) {
         if (!before) {
             return scorenotes;
         }
@@ -173,12 +171,11 @@ export default class Pianist {
         this.soundbank.playSources(sources, deadline, interval);
     }
 
-    playChord(chord, deadline?, /* noTonic */) {
-        /* noTonic = true; */
+    playChord(chord, deadline?, noTonic?) {
         chord = Chord.tokenize(getTonalChord(chord));
         const notes = Chord.intervals(chord[1])
             .map(i => i.replace('13', '6'))
-            .map((root) => Distance.transpose(chord[0] + '3', root));
+            .map(root => Distance.transpose(chord[0] + '3', root));
         /* .slice(noTonic ? 1 : 0); */
         this.playNotes(notes, deadline);
     }

@@ -2,7 +2,13 @@ import * as WAAClock from 'waaclock';
 
 export class Soundbank {
     buffers = {};
-    constructor(options = {}) {
+    onStop: any;
+    context: AudioContext;
+    overlap: any;
+    clock: any;
+    preload: Promise<[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]>;
+    onTrigger: any;
+    constructor(options: any = {}) {
         this.onTrigger = options.onTrigger || (() => { });
         this.onStop = options.onStop || (() => { });
         this.context = new AudioContext();
@@ -100,8 +106,6 @@ export class Soundbank {
             }, (interval * i) + sound.buffer.duration);
         })
     }
-
-    // TODO: preload whole register
 
     playSources(sources, deadline = 0, interval = 0) {
         if (this.hasLoaded(sources, this.context)) {

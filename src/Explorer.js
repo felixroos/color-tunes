@@ -9,7 +9,7 @@ import { circleIndex, CircleSet } from './components/CircleSet';
 import { stepColor } from './components/Colorizer';
 import Material from './components/Material';
 import Permutator from './components/Permutator';
-import Pianist from './classes/Pianist.js';
+import Pianist from './classes/Pianist';
 import PianoKeyboard from './components/PianoKeyboard';
 import Scales from './components/Scales';
 import Score from './components/Score';

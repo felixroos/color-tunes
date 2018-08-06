@@ -5,11 +5,11 @@ import { getTonalChord } from './chordScales';
 import { CircleSet } from './components/CircleSet';
 import { getProps } from './components/Chroma';
 import PianoKeyboard from './components/PianoKeyboard';
-import Pianist from './classes/Pianist.js';
-import { Pulse } from './classes/Pulse.js';
+import Pianist from './classes/Pianist';
+import { Pulse } from './classes/Pulse';
 import './Band.css';
-import { Metronome } from './classes/Metronome.js';
-import { Drummer } from './classes/Drummer.js';
+import { Metronome } from './classes/Metronome';
+import { Drummer } from './classes/Drummer';
 
 export default class Band extends React.Component {
   styles = {

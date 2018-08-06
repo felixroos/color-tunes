@@ -52,7 +52,7 @@ export class Pulse {
         };
     }
 
-    tickArray(array, callback, length) {
+    tickArray(array, callback, length?) {
         const l = length || this.getMeasureLength() * array.length;
         this.clock.start();
         return this.arrayPulse(array, l, [], 0, callback);

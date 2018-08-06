@@ -1,7 +1,7 @@
-import Pianist from '../dist/Pianist';
-import { Pulse } from '../dist/Pulse';
-import { Metronome } from '../dist/Metronome';
-import { Drummer } from '../dist/Drummer';
+import Pianist from './Pianist';
+import { Pulse } from './Pulse';
+import { Metronome } from './Metronome';
+import { Drummer } from './Drummer';
 
 export default class Band {
     styles = {
@@ -23,10 +23,11 @@ export default class Band {
     metronome = new Metronome();
     drummer = new Drummer();
     pianist = new Pianist();
+    props: any;
 
 
     constructor() {
-        this.state = {
+        this.props = {
             chord: null,
             circle: 'fourths', // fifths, chromatics
             arpeggiate: true,
@@ -47,7 +48,7 @@ export default class Band {
         this.pulse.props = Object.assign(style);
     }
 
-    playTune(measures = this.props.measures, position = this.state.position || [0, 0]) {
+    playTune(measures = this.props.measures, position = this.props.position || [0, 0]) {
         this.pulse.tickArray(measures.map(m => 1), (tick) => {
             this.drummer.bar(tick);
             this.pianist.bar(tick, measures);
@@ -56,7 +57,7 @@ export default class Band {
         this.pulse.start();
     }
 
-    getNextPosition(position = this.state.position, measures = this.props.measures) {
+    getNextPosition(position = this.props.position, measures = this.props.measures) {
         let barIndex = position[0];
         let chordIndex = position[1] + 1;
         if (chordIndex > measures[barIndex].length - 1) {
@@ -67,7 +68,7 @@ export default class Band {
     }
 
     playNextChord(measures = this.props.measures, bpm = 220, beatsPerMeasure = 4, forms = 2) {
-        const position = !this.state.position ? [0, 0] : this.getNextPosition();
+        const position = !this.props.position ? [0, 0] : this.getNextPosition();
         this.playChordAtPosition(position);
     }
 }

@@ -6,7 +6,7 @@ export function arraySum(array) {
     return array.reduce((s, i) => s + i, 0);
 }
 
-export function randomElement(array, weighted?) {
+export function randomElement(array, weighted) {
     if (!weighted) {
         return array[randomNumber(array.length)];
     }

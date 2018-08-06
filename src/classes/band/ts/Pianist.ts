@@ -1,12 +1,10 @@
 import * as Note from 'tonal-note';
-// import * as TonalArray from 'tonal-array';
-import { sounds } from '../assets/sounds/sounds.js';
+import { sounds } from '../../../assets/sounds/sounds.js';
 import { Soundbank } from './Soundbank';
 import { Interval } from 'tonal';
 import { Distance } from 'tonal';
 import { Chord } from 'tonal';
-import { getTonalChord } from '../../chordScales.js';
-import { randomElement, getOne } from '../dist/util.js';
+import { getTonalChord, randomElement, getOne } from './util';
 export default class Pianist {
     ctx;
     midiOffset = 36;
@@ -56,7 +54,7 @@ export default class Pianist {
     props: any;
     soundbank: any;
 
-    constructor(props) {
+    constructor(props = {}) {
         this.props = Object.assign({}, this.defaults, props || {});
         this.soundbank = new Soundbank({
             preload: sounds,
@@ -175,12 +173,12 @@ export default class Pianist {
         this.soundbank.playSources(sources, deadline, interval);
     }
 
-    playChord(chord, deadline, /* noTonic */) {
+    playChord(chord, deadline?, /* noTonic */) {
         /* noTonic = true; */
         chord = Chord.tokenize(getTonalChord(chord));
         const notes = Chord.intervals(chord[1])
             .map(i => i.replace('13', '6'))
-            .map((root => Distance.transpose(chord[0] + '3', root));
+            .map((root) => Distance.transpose(chord[0] + '3', root));
         /* .slice(noTonic ? 1 : 0); */
         this.playNotes(notes, deadline);
     }

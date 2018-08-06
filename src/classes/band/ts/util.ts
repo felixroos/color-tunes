@@ -1,7 +1,4 @@
-
-
 import * as Chord from 'tonal-chord';
-import * as Note from 'tonal-note';
 import * as Scale from 'tonal-scale';
 import * as PcSet from 'tonal-pcset';
 
@@ -72,21 +69,22 @@ export function getTonalChord(chord) {
     return tokens[0] + (s[0] || 'M');
 }
 
-export const chordScales = name => {
+/* export const chordScales = name => {
     const isSuperset = PcSet.isSupersetOf(Chord.intervals(name));
-    return Scale.names().filter(name => isSuperset(Scale.intervals(name)));
+    //return Scale.names().filter(name => isSuperset(Scale.intervals(name)));
+    return Scale.names().filter(name => PcSet.isSupersetOf(Scale.intervals(name)));
 };
 
 export const scaleChords = name => {
     const isSubset = PcSet.isSubsetOf(Scale.intervals(name));
     return Chord.names().filter(name => isSubset(Chord.intervals(name)));
-};
+}; */
 
 export function getChromas(root, scales) {
     return scales.map(scale => PcSet.chroma(Scale.notes(root, scale)));
 }
 
-export function matchChordScales(...chords) {
+/* export function matchChordScales(...chords) {
     const scales = chords
         .map(chord => getTonalChord(chord))
         .map(chord => chordScales(chord));
@@ -119,4 +117,4 @@ export function matchChordScales(...chords) {
         Note.names(' b').filter((note, index) => chroma[index] === '1')
     );
     return { chords, scales, chromas, shared, colors, material };
-}
+} */

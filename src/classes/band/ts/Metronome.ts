@@ -1,8 +1,9 @@
 
-import { Soundbank } from '../dist/Soundbank';
-import * as metronomeUp from '../assets/MetronomeUp.wav';
+import { Soundbank } from './Soundbank';
+import * as metronomeUp from './samples/metronome';
 
 export class Metronome {
+    soundbank: Soundbank;
     constructor(props = {}) {
         this.soundbank = new Soundbank({ preload: [metronomeUp] });
         this.soundbank.preload.then((loaded) => {
@@ -13,9 +14,5 @@ export class Metronome {
         tick.pulse.tickArray([1, 1, 1, 1].slice(0, Math.floor(tick.cycle)), (t) => {
             this.soundbank.playSources([metronomeUp], t.deadline);
         }, tick.length);
-
-        /* tick.pulse.tickArray([1, 1, 1, 1].slice(0, Math.floor(beats)), (t) => {
-            this.soundbank.playSources([metronomeUp], t.event.deadline);
-        }, tick.length); */
     }
 }

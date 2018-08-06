@@ -5,7 +5,6 @@ import { Drummer } from './Drummer';
 
 export default class Band {
     constructor(props = {}) {
-        console.log('props', props);
         this.props = Object.assign({
             context: props.context || new AudioContext()
         }, props);
@@ -30,7 +29,10 @@ export default class Band {
         this.metronome = new Metronome({ context });
         this.drummer = new Drummer({ context });
         this.pianist = new Pianist({ context, itelligentVoicings: false });
-        this.ready = Promise.all([this.resume(), this.pianist.ready, this.drummer.ready, this.metronome.ready]);
+    }
+
+    ready() {
+        return Promise.all([this.resume(), this.pianist.ready, this.drummer.ready, this.metronome.ready]);
     }
 
     resume() { // https://goo.gl/7K7WLu

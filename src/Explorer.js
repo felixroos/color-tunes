@@ -9,17 +9,23 @@ import { circleIndex, CircleSet } from './components/CircleSet';
 import { stepColor } from './components/Colorizer';
 import Material from './components/Material';
 import Permutator from './components/Permutator';
-import Pianist from './classes/Pianist';
+import * as jazz from 'jazzband';
 import PianoKeyboard from './components/PianoKeyboard';
 import Scales from './components/Scales';
 import Score from './components/Score';
 import { groupNames, randomChord, randomItem, randomScale } from './components/Symbols';
 import './Explorer.css';
+import { piano } from 'jazzband/demo/samples/piano';
+
+console.log('jazz', jazz);
+
 
 export default class Explorer extends React.Component {
     chromatics = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
     defaultGroup = 'Advanced';
-    pianist = new Pianist({ intelligentVoicings: false });
+    context = new AudioContext();
+    keyboard = new jazz.Sampler({ samples: piano, midiOffset: 24, gain: 1, context: this.context });
+    pianist = new jazz.Pianist(this.keyboard);
 
     constructor() {
         super();
@@ -197,7 +203,7 @@ export default class Explorer extends React.Component {
         if (this.state.autoplay) {
             setTimeout(() => {
                 const props = getProps(this.state);
-                this.pianist.playNotes(props.scorenotes);
+                this.pianist.playNotes(props.scorenotes, { tonic: this.state.tonic });
             }, 50)
         }
     }
@@ -343,7 +349,7 @@ export default class Explorer extends React.Component {
                     </ul>
                     <h5>Pianist</h5>
                     <ul className="scroll">
-                        <li onClick={() => this.pianist.playNotes(props.scorenotes)}>play</li>
+                        <li onClick={() => this.pianist.playNotes(props.scorenotes, { tonic: this.state.tonic })}>play</li>
                         <li className={this.state.autoplay ? 'active' : ''} onClick={() => this.setState({ autoplay: !this.state.autoplay })}>autoplay</li>
                         <li className={this.state.fixedOctave ? 'active' : ''} onClick={() => this.setState({ fixedOctave: !this.state.fixedOctave })}>fixedOctave</li>
                         <li className={this.state.tonicInBass ? 'active' : ''} onClick={() => this.setState({ tonicInBass: !this.state.tonicInBass })}>tonicInBass</li>

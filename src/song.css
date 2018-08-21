@@ -1,10 +1,59 @@
-.song > ul.info {
+.songs {
+  height: calc(100% - 50px);
+  width: 100%;
+  position: absolute;
+  top: 50px;
+  display: flex;
+}
+
+.song-view {
+  padding: 10px;
+  box-sizing: border-box;
+  width: 75vw;
+  margin-left: 25vw;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  overflow: auto;
+}
+
+.song>ul.info {
   display: flex;
   list-style: none;
   padding: 0;
 }
 
-.song > ul.info > li {
+.song>ul.info>li {
   padding-right: 10px;
   box-sizing: border-box;
+}
+
+.song-list {
+  box-sizing: border-box;
+  width: 25vw;
+  height: 100%;
+  overflow: auto;
+  background: #efefef;
+  padding: 10px;
+}
+
+.song-list input {
+  width: 100%;
+}
+
+.song-list ul li a {
+  padding: 5px;
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+h1 {
+  padding: 0;
+  margin: 0;
+}
+
+.random-song {
+  float: right;
 }

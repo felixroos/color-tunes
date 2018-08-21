@@ -13,8 +13,6 @@ const Navigation = ({ route }) => (
 
 export default ({ route, onTonicChange }) => (
     <div className="Header row">
-        <div className="column column-100">
-            <Navigation route={route} />
-        </div>
+        <Navigation route={route} />
     </div>
 );

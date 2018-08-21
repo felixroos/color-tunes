@@ -22,6 +22,9 @@ export default class Songs extends React.Component {
     if (this.state.length) {
       return tunes.filter((tune) => tune.music.measures.length === parseInt(this.state.length));
     }
+    if (this.state.title) {
+      return tunes.filter((tune) => tune.title.toLowerCase().includes(this.state.title.toLowerCase()));
+    }
     return tunes;
   }
 
@@ -36,18 +39,14 @@ export default class Songs extends React.Component {
       ));
     return (
       <div className="songs">
-        <button onClick={() => this.setState({ song: this.randomSong() })}>
-          Zufall
-        </button>
-        <Song data={this.state.song} />
-        <label>Measures<br />
-          <input type="number" ref="lengthFilter" />
-        </label>
-        <br />
-        <button onClick={() => this.setState({ length: this.refs.lengthFilter.value })}>
-          Filter
-        </button>
-        <ul>{songs}</ul>
+        <div className="song-list">
+          <input onKeyUp={() => this.setState({ title: this.refs.titleFilter.value })} type="text" ref="titleFilter" />
+          <ul>{songs}</ul>
+        </div>
+        <div className="song-view">
+          <button className="random-song" onClick={() => this.setState({ song: this.randomSong() })}>Zufall</button>
+          <Song data={this.state.song} />
+        </div>
       </div >
     );
   }

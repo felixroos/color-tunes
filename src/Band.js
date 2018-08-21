@@ -5,11 +5,8 @@ import { getTonalChord } from './chordScales';
 import { CircleSet } from './components/CircleSet';
 import { getProps } from './components/Chroma';
 import PianoKeyboard from './components/PianoKeyboard';
-import Pianist from './classes/Pianist';
-import { Pulse } from './classes/Pulse';
+import * as jazz from 'jazzband';
 import './Band.css';
-import { Metronome } from './classes/Metronome';
-import { Drummer } from './classes/Drummer';
 
 export default class Band extends React.Component {
   styles = {
@@ -27,10 +24,10 @@ export default class Band extends React.Component {
     'Funk': {},
   };
   defaultStyle = 'Medium Swing';
-  pulse = new Pulse({ bpm: 130 });
-  metronome = new Metronome();
-  drummer = new Drummer();
-  pianist = new Pianist({
+  pulse = new jazz.Pulse({ bpm: 130 });
+  metronome = new jazz.Metronome();
+  drummer = new jazz.Drummer();
+  pianist = new jazz.Pianist({
     onTrigger: (activeNotes) => {
       this.setState({ activeNotes });
     },

@@ -1,10 +1,10 @@
-.sheet {
+.section {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
 }
 
-.sheet>.measure {
+.section>.measure {
   flex: 1 0 25%;
   width: 22%;
   height: 60px;
@@ -13,16 +13,28 @@
   margin: 0px;
   font-size: 2em;
   display: flex;
+  border-left: 1px solid black;
+  margin-bottom: 5px;
 }
 
-.sheet>.measure>.chord {
+.section>.measure.house {
+  border-top: 1px dashed black;
+}
+
+.section>.measure>.signs {
+  /* flex: 1 0 25%; */
+  position: relative;
+  padding-top: 12px;
+}
+
+.section>.measure>.chord {
   flex: 1 0 25%;
   width: 22%;
   position: relative;
   padding-top: 12px;
 }
 
-.chord.is-active {
+.is-active {
   background-color: black;
   color: white;
 }

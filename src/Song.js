@@ -1,20 +1,12 @@
 import React from 'react';
 import { RealParser } from 'jazzband/lib/RealParser';
 import Sheet from './Sheet';
-import { piano } from 'jazzband/demo/samples/piano';
-import { drumset } from 'jazzband/demo/samples/drumset';
-/* import Band from './Band'; */
+import Band from './Band';
 import './song.css';
-import { Trio, Sampler } from 'jazzband';
 export default class Song extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
-    const context = new AudioContext();
-    const keyboard = new Sampler({ samples: piano, midiOffset: 24, gain: 1, context });
-    const drums = new Sampler({ samples: drumset, context, gain: 0.7, duration: 6000 });
-
-    this.band = new Trio({ context, piano: keyboard, bass: keyboard, drums });
 
   }
   selectChord(chord) {
@@ -26,16 +18,15 @@ export default class Song extends React.Component {
   }
   render() {
     this.song = this.props.data;
-    this.parser = new RealParser(this.song.music.raw);
-    console.log('parser', this.parser);
-    // song.music.measures = [['Bb^7'],['G7#5'],['C-7'], ['F7','F#o7'],['G-7'],['F-7']];
+    this.parsed = new RealParser(this.song.music.raw); // TODO: outsource parsing...
     return (
       <div className="song">
         <h1>{this.song.title}</h1>
         <SongInfo song={this.song} />
-        <Sheet measures={this.song.music.measures} position={this.state.position} onClickChord={(chord) => this.selectChord(chord)} />
-        <button onClick={() => this.band.comp(this.parser.bars, { metronome: true })}>play</button>
-        {/* <Band measures={song.music.measures} style={song.style} onChangePosition={(position) => this.setState({ position })} /> */}
+        {/* <Sheet measures={this.song.music.measures} position={this.state.position} onClickChord={(chord) => this.selectChord(chord)} /> */}
+        <Sheet sheet={this.parsed.sheet} highlight={this.state.position} onClickChord={(chord) => this.selectChord(chord)} />
+        <Band sheet={this.parsed.sheet} onChangePosition={(position) => this.setState({ position })} />
+        {/*style={song.style}  */}
       </div >
     );
   }

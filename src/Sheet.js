@@ -2,6 +2,7 @@ import React from 'react';
 import './sheet.css';
 import Chord from './Chord';
 import { matchChordScales } from './chordScales';
+import { getMeasure } from 'jazzband/lib/Song';
 
 class Measure extends React.Component {
   render() {
@@ -11,16 +12,71 @@ class Measure extends React.Component {
         chord={chord}
         key={index}
         onClick={() => this.props.onClickChord(chord)}
-        harmony={this.props.harmony[index]}
+        harmony={this.props.harmony ? this.props.harmony[index] : null}
       />
     ));
-    return <div className="measure">{chords}</div>;
+    const signs = this.props.signs || [];
+    let before = '', after = '';
+    if (signs.includes('{')) {
+      before += ':'
+    }
+    if (signs.includes('}')) {
+      after += ':';
+    }
+    //${this.props.house /* && !this.props.index */ ? ' house' : ''}
+    return <div className={`measure${this.props.active ? ' is-active' : ''}`}>
+      <div className="signs">
+        {before}
+        {signs.filter(s => !['{', '}'].includes(s)).join(' ')}
+      </div>
+      {chords}
+      <div className="signs">
+        {after}
+      </div>
+    </div>;
   }
 }
 
 export default class Sheet extends React.Component {
   render() {
-    const measures = this.props.measures;
+    let sheet = this.props.sheet;
+    if (sheet) {
+      sheet = sheet
+        .map(m => getMeasure(m));
+      const chords = sheet
+        .map((measure, index) => (
+          <Measure key={index} measure={measure.chords} active={index === this.props.highlight} signs={measure.signs} />
+        ));
+      return <div className="sheet">
+        <div className="section">
+          {chords}
+        </div>
+      </div>
+    }/* 
+    const sections = this.props.sections;
+    if (sections) {
+      return <div className="sheet">
+        {
+          sections
+            .map((section, s) =>
+              (<div key={s} className="section">
+                {
+                  section.bars
+                    .map((bar, b) =>
+                      (<Measure key={[s, b]} measure={bar} />)
+                    ).concat(
+                      section.endings
+                        .map((ending, h) =>
+                          ending.map((bar, i) => (<Measure key={[s, h, i]} house={h + 1} index={i} measure={bar} />))
+                        )
+                    )
+                }
+              </div>)
+            )
+        }
+      </div>
+    } */
+    /* const measures = this.props.measures;
     const harmony = measures.map((measure, index) => {
       return measure.map((chord, position) => {
         const brothers = [chord];
@@ -60,6 +116,6 @@ export default class Sheet extends React.Component {
         key={index}
         onClickChord={(chord) => this.props.onClickChord(chord)} />;
     });
-    return <div className="sheet">{bars}</div>;
+    return <div className="sheet">{bars}</div>; */
   }
 }

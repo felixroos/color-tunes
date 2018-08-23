@@ -5,37 +5,13 @@ import { getTonalChord } from './chordScales';
 import { CircleSet } from './components/CircleSet';
 import { getProps } from './components/Chroma';
 import PianoKeyboard from './components/PianoKeyboard';
-import * as jazz from 'jazzband';
 import './Band.css';
 
-export default class Band extends React.Component {
-  styles = {
-    'Medium Swing': {},
-    'Slow Swing': {},
-    'Medium Up Swing': {},
-    'Up Tempo Swing': {},
-    'Bossa Nova': {},
-    'Latin': {},
-    'Waltz': {},
-    'Even 8ths': {},
-    'Afro': {},
-    'Ballad': {},
-    'Rock Pop': {},
-    'Funk': {},
-  };
-  defaultStyle = 'Medium Swing';
-  pulse = new jazz.Pulse({ bpm: 130 });
-  metronome = new jazz.Metronome();
-  drummer = new jazz.Drummer();
-  pianist = new jazz.Pianist({
-    onTrigger: (activeNotes) => {
-      this.setState({ activeNotes });
-    },
-    /* onStop: (notes) => {
-      console.log('stop', notes);
-    } */
-  });
+import { piano } from 'jazzband/demo/samples/piano';
+import { drumset } from 'jazzband/demo/samples/drumset';
+import * as jazz from 'jazzband';
 
+export default class Band extends React.Component {
 
   constructor() {
     super();
@@ -48,68 +24,49 @@ export default class Band extends React.Component {
       position: null,
       activeNotes: null
     };
-  }
+    console.log('band');
+    const context = new AudioContext();
+    this.context = context;
+    this.keyboard = new jazz.Sampler({ samples: piano, midiOffset: 24, gain: 1, context });
+    this.drums = new jazz.Sampler({ samples: drumset, context, gain: 0.7, duration: 6000 });
 
-  setPosition(position, play) {
-    const chord = this.props.measures[position[0]][position[1]];
-    this.setState({ position, chord });
-    if (this.props.onChangePosition) {
-      this.props.onChangePosition(position);
-    }
-    if (play) {
-      this.pianist.playChord(chord);
-    }
-  }
-
-  applyStyle(styleName) {
-    const style = this.styles[styleName] || this.styles[this.defaultStyle];
-    this.pulse.props = Object.assign(style);
-  }
-
-  playTune(measures = this.props.measures, position = this.state.position || [0, 0]) {
-    // this.applyStyle(this.props.style);
-    this.pulse.tickArray(measures, (tick) => {
-      this.setPosition(tick.path); // visuals only
-      // this.pianist.playChord(this.props.measures[tick.path[0]][tick.path[1]], tick.deadline);
+    this.drummer = new jazz.Drummer(this.drums);
+    this.pianist = new jazz.Pianist(this.keyboard, {
+      onTrigger: (activeNotes) => {
+        console.log('trigger..');
+        this.setState({ activeNotes });
+      }
     });
-
-    // bars
-    this.pulse.tickArray(measures.map(m => 1), (tick) => {
-      this.drummer.bar(tick);
-      this.pianist.bar(tick, measures);
-      // this.metronome.bar(tick);
-    });
-
-    this.pulse.start();
+    this.bassist = new jazz.Bassist(this.keyboard);
+    this.band = new jazz.Trio({ context, piano: this.keyboard, bass: this.keyboard, drums: this.drums },
+      (measure, tick) => {
+        this.props.onChangePosition(measure.index);
+      });
   }
 
-  getNextPosition(position = this.state.position, measures = this.props.measures) {
-    let barIndex = position[0];
-    let chordIndex = position[1] + 1;
-    if (chordIndex > measures[barIndex].length - 1) {
-      chordIndex = 0;
-      barIndex = (barIndex + 1) % measures.length;
-    }
-    return [barIndex, chordIndex];
-  }
+  /*  setPosition(position, play) {
+     const chord = this.props.measures[position[0]][position[1]];
+     this.setState({ position, chord });
+     if (this.props.onChangePosition) {
+       this.props.onChangePosition(position);
+     }
+     if (play) {
+       this.pianist.playChord(chord);
+     }
+   } */
 
-  playNextChord(measures = this.props.measures, bpm = 220, beatsPerMeasure = 4, forms = 2) {
-    const position = !this.state.position ? [0, 0] : this.getNextPosition();
-    this.setPosition(position, true);
-  }
-
-  highlight(highlightedNotes) {
+  /* highlight(highlightedNotes) {
     this.setState({ highlightedNotes })
   }
-
+  
   unhighlight(notes) {
     const highlightedNotes = this.state.highlightedNotes
       .filter(note => notes.includes(note));
     this.setState({ highlightedNotes })
-  }
+  } */
 
   render() {
-    let piano, circle, label; //, score = '';
+    let keys, circle, label; //, score = '';
     const chord = this.props.chord || this.state.chord;
     if (chord) {
       const chordTokens = Chord.tokenize(getTonalChord(chord));
@@ -130,7 +87,7 @@ export default class Band extends React.Component {
         labels={props.labels}
       />);
 
-      piano = (<PianoKeyboard
+      keys = (<PianoKeyboard
         width="100%"
         setChroma={props.chroma}
         setTonic={Note.chroma(props.tonic)}
@@ -143,19 +100,9 @@ export default class Band extends React.Component {
 
     return (
 
-      <div className="player">
-        <ul>
-          <li>
-            <a onClick={() => this.playTune()}>play {this.pulse.props.bpm}</a>
-          </li>
-          <li>
-            <a onClick={() => this.pulse.stop()}>stop</a>
-          </li>
-          <li>
-            <a onClick={() => this.playNextChord()}>next chord</a>
-          </li>
-        </ul>
-        {piano}
+      <div className="band">
+        <button onClick={() => this.band.comp(this.props.sheet, { metronome: true })}>play</button>
+        {keys}
         {label}
         {circle}
         {/* score */}

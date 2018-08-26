@@ -1,8 +1,15 @@
 import React from 'react';
 import './sheet.css';
 import Chord from './Chord';
-import { matchChordScales } from './chordScales';
 import { getMeasure } from 'jazzband/lib/Song';
+
+const font = {
+  '{': '',
+  '}': '',
+  'Q': '',
+  'x': '',
+  'r': ''
+}
 
 class Measure extends React.Component {
   render() {
@@ -16,12 +23,13 @@ class Measure extends React.Component {
       />
     ));
     const signs = this.props.signs || [];
+    // TODO: add time + section + house
     let before = '', after = '';
     if (signs.includes('{')) {
-      before += ':'
+      before += font['{'];
     }
     if (signs.includes('}')) {
-      after += ':';
+      after += font['}'];
     }
     //${this.props.house /* && !this.props.index */ ? ' house' : ''}
     return <div className={`measure${this.props.active ? ' is-active' : ''}`}>
@@ -45,7 +53,11 @@ export default class Sheet extends React.Component {
         .map(m => getMeasure(m));
       const chords = sheet
         .map((measure, index) => (
-          <Measure key={index} measure={measure.chords} active={index === this.props.highlight} signs={measure.signs} />
+          <Measure
+            onClickChord={(chord) => this.props.onClickChord(chord)}
+            key={index} measure={measure.chords}
+            active={index === this.props.highlight}
+            signs={measure.signs} />
         ));
       return <div className="sheet">
         <div className="section">

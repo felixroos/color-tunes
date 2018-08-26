@@ -7,7 +7,8 @@
     "chord-translator": "^0.1.2",
     "classcat": "^2.0.0",
     "gh-pages": "^1.1.0",
-    "jazzband": "^0.2.0",
+    "jazzband": "^0.3.0",
+    "opensheetmusicdisplay": "^0.3.1",
     "prop-types": "^15.6.2",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
@@ -18,10 +19,12 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start-with-symlink": "symlink && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "symlink": "rm -rf ./node_modules/jazzband && ln -s ~/projects/jazzband ./node_modules/"
   }
 }

@@ -1,27 +1,33 @@
 import React from 'react';
 import Song from './Song';
 import standards from './assets/standards.json';
+import { RealParser } from 'jazzband/lib/RealParser';
 
 export default class Songs extends React.Component {
   constructor() {
     super();
     this.state = {
-      song: this.randomSong()
     };
+  }
+
+  componentWillMount() {
+    if (!this.state.song) {
+      this.select(this.randomSong());
+    }
   }
   randomSong() {
     return standards[
       Math.floor(Math.random(standards.length) * standards.length)
     ];
   }
-  select(song) {
+  select(song) { //ireal song
+    const parsed = new RealParser(song.music.raw);
+    const sheet = parsed.sheet;
+    song = Object.assign(song, { sheet, measures: parsed.measures });
     this.setState({ song });
   }
 
   filterTunes(tunes) {
-    if (this.state.length) {
-      return tunes.filter((tune) => tune.music.measures.length === parseInt(this.state.length));
-    }
     if (this.state.title) {
       return tunes.filter((tune) => tune.title.toLowerCase().includes(this.state.title.toLowerCase()));
     }
@@ -44,7 +50,7 @@ export default class Songs extends React.Component {
           <ul>{songs}</ul>
         </div>
         <div className="song-view">
-          <button className="random-song" onClick={() => this.setState({ song: this.randomSong() })}>Zufall</button>
+          <button className="random-song" onClick={() => this.select(this.randomSong())}>Zufall</button>
           <Song data={this.state.song} />
         </div>
       </div >

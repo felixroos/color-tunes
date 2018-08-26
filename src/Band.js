@@ -1,111 +1,127 @@
 import React from 'react';
-import * as Chord from 'tonal-chord';
 import * as Note from 'tonal-note';
-import { getTonalChord } from './chordScales';
 import { CircleSet } from './components/CircleSet';
-import { getProps } from './components/Chroma';
 import PianoKeyboard from './components/PianoKeyboard';
 import './Band.css';
 
 import { piano } from 'jazzband/demo/samples/piano';
 import { drumset } from 'jazzband/demo/samples/drumset';
 import * as jazz from 'jazzband';
+import { funk } from 'jazzband/lib/grooves/funk.js';
+import { disco } from 'jazzband/lib/grooves/disco.js';
+import { swing } from 'jazzband/lib/grooves/swing.js';
 
 export default class Band extends React.Component {
+
+  grooves = { swing, funk, disco };
 
   constructor() {
     super();
     this.state = {
-      chord: null,
       circle: 'fourths', // fifths, chromatics
       arpeggiate: true,
       overlap: false,
       autoplay: true,
       position: null,
-      activeNotes: null
+      activeNotes: [],
+      tempo: 130,
     };
-    console.log('band');
     const context = new AudioContext();
     this.context = context;
-    this.keyboard = new jazz.Sampler({ samples: piano, midiOffset: 24, gain: 1, context });
+    this.keyboard = new jazz.Sampler({
+      samples: piano, midiOffset: 24, gain: 1, context,
+      onTrigger: ({ on, off, active }) => this.updateActiveNotes(active)
+    });
     this.drums = new jazz.Sampler({ samples: drumset, context, gain: 0.7, duration: 6000 });
 
     this.drummer = new jazz.Drummer(this.drums);
-    this.pianist = new jazz.Pianist(this.keyboard, {
-      onTrigger: (activeNotes) => {
-        console.log('trigger..');
-        this.setState({ activeNotes });
+    this.pianist = new jazz.Pianist(this.keyboard);
+    this.bassist = new jazz.Bassist(this.keyboard);
+    this.band = new jazz.Trio({
+      context, piano: this.keyboard, bass: this.keyboard, drums: this.drums,
+      onMeasure: (measure, tick) => {
+        this.props.onChangePosition(measure.index);
       }
     });
-    this.bassist = new jazz.Bassist(this.keyboard);
-    this.band = new jazz.Trio({ context, piano: this.keyboard, bass: this.keyboard, drums: this.drums },
-      (measure, tick) => {
-        this.props.onChangePosition(measure.index);
-      });
   }
 
-  /*  setPosition(position, play) {
-     const chord = this.props.measures[position[0]][position[1]];
-     this.setState({ position, chord });
-     if (this.props.onChangePosition) {
-       this.props.onChangePosition(position);
-     }
-     if (play) {
-       this.pianist.playChord(chord);
-     }
-   } */
 
-  /* highlight(highlightedNotes) {
-    this.setState({ highlightedNotes })
+  updateActiveNotes(events) {
+    this.setState({ activeNotes: events.map(e => e.note) });
   }
-  
-  unhighlight(notes) {
-    const highlightedNotes = this.state.highlightedNotes
-      .filter(note => notes.includes(note));
-    this.setState({ highlightedNotes })
-  } */
+
+  changeTempo(delta) {
+    const newTempo = this.state.tempo + delta;
+    if (this.band && this.band.pulse) {
+      this.band.pulse.changeTempo(newTempo);
+    }
+    this.setState({ tempo: newTempo });
+  }
+
+  play() {
+    this.band.comp(this.props.sheet, { metronome: true, bpm: this.state.tempo, groove: this.grooves.swing });
+    console.log('tempo', this.band.pulse.props.bpm);
+    this.setState({ tempo: this.band.pulse.props.bpm });
+  }
+
+  stop() {
+    this.band.pulse.stop();
+    this.props.onChangePosition(-1);
+  }
+
+  randomInstruments() {
+    const allowed = ['sine', 'triangle', 'square', 'sawtooth'];
+    if (!this.band) {
+      return;
+    }
+    this.band.pianist.instrument = jazz.util.randomSynth(this.band.mix, allowed);
+    this.band.pianist.instrument.onTrigger = ({ on, off, active }) => this.updateActiveNotes(active);
+    this.band.bassist.instrument = jazz.util.randomSynth(this.band.mix, allowed);
+  }
 
   render() {
-    let keys, circle, label; //, score = '';
-    const chord = this.props.chord || this.state.chord;
-    if (chord) {
-      const chordTokens = Chord.tokenize(getTonalChord(chord));
-      const props = getProps({ tonic: chordTokens[0], chord: chordTokens[1], order: true });
-      if (!props) {
-        console.warn('invalid chord..');
-        return null;
-      }
-      if (this.state.activeNotes) {
-        props.order = this.state.activeNotes.map(note => Note.chroma(note)) || props.order;
-      }
-      circle = (<CircleSet
-        size="200"
-        chroma={props.chroma}
-        order={props.order}
-        ordered={true}
-        origin={props.tonic}
-        labels={props.labels}
-      />);
+    let keys, circle, label, score = '';
 
-      keys = (<PianoKeyboard
-        width="100%"
-        setChroma={props.chroma}
-        setTonic={Note.chroma(props.tonic)}
-        notes={props.notes}
-        scorenotes={this.state.activeNotes || []}
-        highlightedNotes={this.state.highlightedNotes}
-      />);
+    // console.log('active notes', this.state.activeNotes);
+    // props.order = this.state.activeNotes.map(note => Note.chroma(note)) || props.order;
+    const chroma = new Array(12).fill(0).map((z, index) =>
+      !!this.state.activeNotes.find(n => Note.chroma(n) === index) ? 1 : 0
+    ).join('');
 
-    }
+    circle = (chroma && <CircleSet
+      size="200"
+      chroma={chroma}
+    /* order={props.order}
+    ordered={true}
+    origin={props.tonic}
+    labels={props.labels} */
+    />);
+
+    keys = (<PianoKeyboard
+      width="100%"
+      /* setChroma={props.chroma} */
+      setTonic={Note.chroma('C')}
+      /* notes={props.notes} */
+      scorenotes={this.state.activeNotes || []}
+      highlightedNotes={this.state.activeNotes || []}
+    />);
+
+    /* score = <Score
+      notes={this.state.activeNotes}
+    />; */
 
     return (
-
       <div className="band">
-        <button onClick={() => this.band.comp(this.props.sheet, { metronome: true })}>play</button>
         {keys}
+        <button onClick={() => this.play()}>play</button>
+        <button onClick={() => this.stop()}>stop</button>
+        <button onClick={() => this.changeTempo(-10)}>slower</button>
+        <strong>{this.state.tempo}</strong>
+        <button onClick={() => this.changeTempo(10)}>faster</button>
+        <button onClick={() => this.randomInstruments()}>Random Instruments</button>
         {label}
-        {circle}
-        {/* score */}
+        {/* circle */}
+        {score}
       </div >
     );
   }

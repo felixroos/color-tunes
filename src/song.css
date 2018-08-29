@@ -17,14 +17,14 @@
   overflow: auto;
 }
 
-.song>ul.info {
+.song-info>.sub {
   display: flex;
-  list-style: none;
   padding: 0;
+  justify-content: flex-start;
 }
 
-.song>ul.info>li {
-  padding-right: 10px;
+.song-info>.sub>div {
+  margin: 10px;
   box-sizing: border-box;
 }
 

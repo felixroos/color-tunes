@@ -32,7 +32,7 @@ const getKeyTypes = (type, midi, pcset, scorenotes, highlightedNotes = []) => {
     ]);
 };
 
-const Key = ({ type, chroma, i, oct, pcset, scorenotes, highlightedNotes, x, onClick }) => {
+const Key = ({ type, chroma, i, oct, pcset, scorenotes, highlightedNotes, x, onClick, colorize }) => {
     const isWhite = type === "white";
     const midi = (oct) * 12 + chroma;
     const offset = (isWhite
@@ -44,11 +44,18 @@ const Key = ({ type, chroma, i, oct, pcset, scorenotes, highlightedNotes, x, onC
         onClick(midi);
     };
     const keyClass = `note-${midi} ${getKeyTypes(type, midi, pcset, scorenotes, highlightedNotes)}`;
+    const style = {};
+    if (colorize) {
+        Object.assign(style, {
+            fill: colorize(midi, isWhite)
+        });
+    }
 
     return (
         <rect
             key={"note-" + midi}
             id={"note-" + midi}
+            style={style}
             className={keyClass}
             width={isWhite ? WHITE_WIDTH : BLACK_WIDTH}
             height={isWhite ? WHITE_HEIGHT : BLACK_HEIGHT}
@@ -80,7 +87,8 @@ export default ({
     highlightedNotes,
     onClick,
     minOct = 1,
-    maxOct = 9
+    maxOct = 9,
+    colorize
 }) => {
     const pcset = { tonic: setTonic, chroma: setChroma || "" };
 
@@ -132,6 +140,7 @@ export default ({
                             key={"oct-" + o}
                             oct={o}
                             x={i * 7 * WHITE_WIDTH - (5 * WHITE_WIDTH)}
+                            colorize={colorize}
                             pcset={pcset}
                             scorenotes={scorenotes}
                             highlightedNotes={highlightedNotes}

@@ -1,48 +1,84 @@
-@font-face {
-  font-family: 'iRealFont';
-  src: url('fonts/iRealFont.woff') format('woff'), url('fonts/iRealFont.ttf') format('truetype'), url('fonts/iRealFont.svg#webfont') format('svg');
-  font-weight: normal;
-  font-style: normal;
-}
-
 .sheet {
-  font-family: iRealFont;
-}
-
-.section {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
 
-.section>.measure {
-  flex: 1 0 25%;
-  width: 22%;
-  height: 60px;
+.sheet .cell {
+  flex: 0 0 25%;
+  max-width: 25%;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.sheet .cell-header {
+  height: 20px;
+  display: flex;
+  margin-bottom: 2px;
+}
+
+.sheet .cell-footer {
+  height: 18px;
+}
+
+.sheet .cell-body {
+  overflow: auto;
+  display: flex;
+  height: 38px;
+  border-right: 1px solid black;
+}
+
+.sheet .measure {
+  flex: auto;
   box-sizing: border-box;
   padding: 0;
   margin: 0px;
-  font-size: 2em;
+  font-size: 1.5em;
   display: flex;
+}
+
+.sheet .cell.block-start .cell-header {
+  margin-left: 12px;
+}
+
+.sheet .space {
+  display: block;
+  width: 12px;
+  height: 100%;
+}
+
+.measure .signs {
+  display: flex;
+  align-items: center;
+}
+
+.cell.block-start .measure {
   border-left: 1px solid black;
-  margin-bottom: 5px;
 }
 
-.section>.measure.house {
-  border-top: 1px dashed black;
+.cell .house {
+  border-left: 1px solid black;
+  border-top: 1px solid black;
+  padding: 0 2px;
+  width: 80%;
 }
 
-.section>.measure>.signs {
-  /* flex: 1 0 25%; */
-  position: relative;
-  padding-top: 12px;
+.cell .section {
+  padding: 0 2px;
+  border: 1px solid black;
+  margin-right: 5px;
 }
 
-.section>.measure>.chord {
+.sheet .top {
+  width: 100%;
+}
+
+.sheet .measure>.chord {
   flex: 1 0 25%;
   width: 22%;
-  position: relative;
-  padding-top: 12px;
+  display: flex;
+  align-items: center;
+  /* padding-top: 12px; */
 }
 
 .is-active {
@@ -58,6 +94,6 @@
 }
 
 .chord-name {
-  position: absolute;
+  white-space: nowrap;
   padding-left: 5px;
 }

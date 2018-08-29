@@ -4,7 +4,7 @@ function readableChord(chord) {
   if (!chord) {
     return chord;
   }
-  return chord.replace('^', '△').replace('h', 'ø');
+  return chord.replace('^', '△').replace('h', 'ø').replace('x', '%').replace('r', '%').replace('0', '');
 }
 
 export default class Chord extends React.Component {

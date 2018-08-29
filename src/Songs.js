@@ -23,6 +23,8 @@ export default class Songs extends React.Component {
   select(song) { //ireal song
     const parsed = new RealParser(song.music.raw);
     const sheet = parsed.sheet;
+    console.log('tokens', parsed.tokens);
+    console.log('sheet', sheet);
     song = Object.assign(song, { sheet, measures: parsed.measures });
     this.setState({ song });
   }

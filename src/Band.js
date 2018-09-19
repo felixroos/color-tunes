@@ -75,8 +75,13 @@ export default class Band extends React.Component {
       return;
     }
     this.band.pianist.instrument = jazz.util.randomSynth(this.band.mix, allowed);
-    this.band.pianist.instrument.onTrigger = ({ on, off, active }) => this.updateActiveNotes(active);
     this.band.bassist.instrument = jazz.util.randomSynth(this.band.mix, allowed);
+
+    //this.band.pianist.instrument = new jazz.MidiOut({ mix: this.band.mix });
+    //this.band.bassist.instrument = new jazz.MidiOut({ mix: this.band.mix });
+
+    this.band.pianist.instrument.onTrigger = ({ on, off, active }) => this.updateActiveNotes(active);
+    this.band.bassist.instrument.onTrigger = ({ on, off, active }) => this.updateActiveNotes(active);
   }
 
   render() {
@@ -112,7 +117,6 @@ export default class Band extends React.Component {
 
     return (
       <div className="band">
-        {keys}
         <button onClick={() => this.play()}>play</button>
         <button onClick={() => this.stop()}>stop</button>
         <button onClick={() => this.changeTempo(-10)}>slower</button>
@@ -121,6 +125,7 @@ export default class Band extends React.Component {
         <button onClick={() => this.randomInstruments()}>Random Instruments</button>
         {label}
         {/* circle */}
+        {keys}
         {score}
       </div >
     );

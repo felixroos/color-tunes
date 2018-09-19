@@ -1,23 +1,77 @@
 import * as Chord from 'tonal-chord';
+import * as PcSet from 'tonal-pcset';
 import * as Note from 'tonal-note';
 import * as Scale from 'tonal-scale';
-import * as PcSet from 'tonal-pcset';
+import { isChromaParent } from './components/Chroma';
+import { Distance } from 'tonal';
+
+export function isValidChord(chord) {
+    if (!chord) {
+        return;
+    }
+    const chroma = PcSet.chroma(Chord.notes(getTonalChord(chord)));
+    return chroma !== '000000000000';
+}
 
 export function getTonalChord(chord) {
+    if (!chord) {
+        console.warn('no valid chord given: ', chord);
+        return '';
+    }
     chord = chord
         .replace('-', 'm')
+        .replace('^7#5', 'M7#5')
+        .replace('^7#5', 'M7#5')
+        .replace('7#9#5', '7#5#9')
+        .replace('7b9#5', '7#5b9')
         .replace('^', 'M')
         .replace('h7', 'm7b5')
-        .replace('h', 'dim');
-        /**
-         * Chords that dont work:
-         * slash cords are ignored
-         * 7b9b5 does not work
-         * 
-         */
+        .replace('7+', '7#5')
+        .replace('h', 'o');
+    /**
+     * Chords that dont work:
+     * slash cords are ignored
+     * 7b9b5 does not work
+     * 
+     */
     const tokens = Chord.tokenize(chord);
     const s = tokens[1].split('/');
     return tokens[0] + (s[0] || 'M');
+}
+
+export function transposeChord(chord, interval) {
+    if (!chord) {
+        return chord;
+    }
+    const tokens = Chord.tokenize(getTonalChord(chord));
+    let root = Distance.transpose(tokens[0], interval);
+    root = Note.simplify(root);
+    //root = Note.simplify(Note.names(' b').find(note => Note.chroma(note) === Note.chroma(root)));
+    return root + tokens[1];
+}
+
+export function transposeSong(song, instrument = 'C') {
+    const interval = Distance.interval(instrument, 'C');
+    song.sheet.forEach(cell => {
+        if (cell.chords) {
+            cell.transposed = [].concat(cell.chords.map(chord => transposeChord(chord, interval)));
+        }
+    });
+    song.transposed = interval;
+}
+
+export function parentModes(name, mode = 'ionian') {
+    if (!isValidChord(name)) {
+        if (name) {
+            console.warn('invalid chord', name);
+        }
+        return [];
+    }
+    const chroma = PcSet.chroma(Chord.notes(getTonalChord(name)));
+    const match = Note.names(' b').filter(note => {
+        return isChromaParent(PcSet.chroma(Scale.notes(note, mode)), chroma);
+    });
+    return match;
 }
 
 export const chordScales = name => {

@@ -8,7 +8,7 @@ import * as Note from 'tonal-note';
 import * as PcSet from 'tonal-pcset';
 import * as Scale from 'tonal-scale';
 import { chordNames, scaleNames, symbolName } from './Symbols';
-
+import { transposeToRange } from 'jazzband/lib/util';
 
 export const chromatics = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 export function removeOctaves(notes) {
@@ -210,9 +210,9 @@ export function getProps(state) {
     if (!state.scale && !state.chord) {
         return;
     }
-    state = Object.assign({
+    state = Object.assign({}, state, {
         octave: 3
-    }, state);
+    }/* , state */);
 
     const fullTonic = state.tonic + state.octave;
 
@@ -239,7 +239,9 @@ export function getProps(state) {
         subsets = getSubsets(state.chord, false, state.group);
         supersets = getSupersets(state.chord, false, state.group);
     }
-    scorenotes = envelopeCut(scorenotes);
+    //scorenotes = envelopeCut(scorenotes);
+    scorenotes = transposeToRange(scorenotes, ['C3', 'B4']);
+
     state.octave = Note.props(scorenotes.find(n => Note.pc(n) === tonic)).oct;
     if (state.invert) {
         // state.octave -= 1;
@@ -266,7 +268,7 @@ export function getProps(state) {
     const order = notes.map(note => Note.props(note).chroma);
     const parallels = chromaParallels(chroma, state.group);
     return {
-        chord: state.chord, scale: state.scale, tonic, notes, chroma, intervals, scorenotes, label, subsets, supersets, parallels, labels, options, order
+        chord: state.chord, scale: state.scale, octave: state.octave, tonic, notes, chroma, intervals, scorenotes, label, subsets, supersets, parallels, labels, options, order
     };
 }
 

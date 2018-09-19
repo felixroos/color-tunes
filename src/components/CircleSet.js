@@ -3,6 +3,8 @@
 import React from 'react';
 import "./CircleSet.css";
 import { stepColor } from './Colorizer';
+import { Note } from 'tonal';
+import { pitchColor, pitchIndex } from '../components/Colorizer';
 
 export function circleIndex(index, fourths, flip) {
     if (!fourths && !flip) {
@@ -92,6 +94,11 @@ export class CircleSet extends React.Component {
         }, '')
     }
 
+    isHighlighted(label) {
+        return this.props.highlightedNotes && this.props.highlightedNotes
+            .map(n => Note.chroma(n)).includes(Note.chroma(label));
+    }
+
     render() {
         let size = this.props.size || 300;
         if (typeof size === 'string') {
@@ -106,27 +113,37 @@ export class CircleSet extends React.Component {
             return a[circleIndex(i, !this.props.chromatic, this.props.flip)];
         });
 
-        let points = this.getPoints(chroma, size, offset, clinch, true, true, this.props.order);
-        let bgPoints = this.getPoints(chroma, size, offset, clinch, true, true);
+        let points = this.getPoints(chroma, size, offset, clinch, false, true, this.props.order);
+        let bgPoints = this.getPoints(chroma, size, offset, clinch, false, true);
         let positions = this.getPoints(new Array(12).fill(1).join(''), size, offset, clinch);
 
         // render labels
         const fontsize = size / 12;
         const fontclinch = 0.9;
+        const originIndex = labels.indexOf(this.props.origin);
+        //const color = stepColor(originIndex, this.props.flip);
+        //const bgColor = stepColor(originIndex, this.props.flip, 80);
+        const color = pitchColor(this.props.origin, 40, 60);
+        const bgColor = pitchColor(this.props.origin, 50, 80);
 
         const labelNodes = labels
             .map((label, i) => {
                 const pos = this.getPoint(i, size, offset, fontclinch, fontsize / 3);
                 const active = (this.props.order || []).indexOf(circleIndex(i, !this.props.chromatic, this.props.flip)) === -1;
+                const idleColor = !active ? 'black' : 'gray';
+                const highlighted = this.isHighlighted(label);
+                const style = {
+                    textDecoration: highlighted ? 'underline' : 'none',
+                    fill: highlighted ? color : idleColor
+                };
                 return (
                     <text x={pos[0]} y={pos[1]} onClick={(e) => handleClick(e, label)} className={active ? 'active' : ''}
-                        fontFamily="Verdana" fontSize={fontsize} key={i} > {/** fill={color} */}
+                        fontFamily="Verdana" fontSize={fontsize} key={i} style={style}>
                         {label}
                     </text>)
             });
 
         const classNames = 'Circle ' + this.props.type;
-        const originIndex = labels.indexOf(this.props.origin);
         const dot = this.getPoint(originIndex, size, offset, clinch);
         const dotPosition = {
             x: dot[0],
@@ -139,8 +156,6 @@ export class CircleSet extends React.Component {
             e.preventDefault();
             this.props.onClick(label);
         };
-        const color = stepColor(originIndex, this.props.flip);
-        const bgColor = stepColor(originIndex, this.props.flip, 80);
         // hover line?
         let line = ''
         // this.state.line = this.props.order.slice(0, 2).map(i => this.props.labels[i]);

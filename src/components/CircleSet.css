@@ -22,7 +22,6 @@
     opacity: 0.1;
 }
 
-
 /* 
 @keyframes dashdraw {
     to {
@@ -44,7 +43,7 @@
 }
 
 .Circle .background {
-    fill: #eee;
+    fill: white;
     stroke: #c0c0c0;
 }
 

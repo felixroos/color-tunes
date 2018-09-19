@@ -3,7 +3,9 @@ import cat from "classcat";
 import React from 'react';
 import { Array, Note } from "tonal";
 import { circleIndex } from "./CircleSet";
+import { pitchColor } from './Colorizer';
 import { stepColor } from './Colorizer';
+import { colorConfig } from '../config';
 import "./PianoKeyboard.css";
 
 const scale = 0.5;
@@ -99,11 +101,17 @@ export default ({
     const viewWidth = octs.length * 7 * WHITE_WIDTH - ((leftKeyCut + rightKeyCut) * WHITE_WIDTH);
 
     width = width || "100%";
-
+    const tonic = Note.names(' b')[setTonic];
+    /* 
     const index = circleIndex(setTonic, true);
     const highlight = stepColor(index, false, 30);
     const color = stepColor(index, false);
-    const bgColor = stepColor(index, false, 80);
+    const bgColor = stepColor(index, false, 80); */
+
+    const highlight = pitchColor(tonic, colorConfig.saturationActive, colorConfig.brightnessActive);
+    const bgColor = pitchColor(tonic, colorConfig.saturationDefault, colorConfig.brightnessDefault);
+    const color = pitchColor(tonic, colorConfig.saturationActive, colorConfig.brightnessActive);
+
     const style = `
       .piano-key.active {
         fill: ${bgColor};

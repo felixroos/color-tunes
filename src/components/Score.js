@@ -15,8 +15,13 @@ class Score extends PureComponent {
         this.updateCanvas();
     }
 
+    isSame(noteA, noteB) {
+        return Note.chroma(noteA) === Note.chroma(noteB) && Note.oct(noteA) === Note.oct(noteB);
+    }
+
     isHighlighted(note) {
-        return this.props.highlightedNotes && this.props.highlightedNotes.includes(note);
+        return this.props.highlightedNotes && this.props.highlightedNotes
+            .find(highlighted => this.isSame(note, highlighted));
     }
 
     updateCanvas() {

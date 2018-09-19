@@ -6,23 +6,23 @@ export const chords = [
         symbol: 'm',
         long: 'minor',
         short: '-',
-        groups: ['Basic']
+        groups: ['Basic', 'Triads']
     },
     {
         symbol: 'M',
         long: 'major',
         short: '△',
-        groups: ['Basic']
+        groups: ['Basic', 'Triads']
     },
     {
         symbol: 'o',
-        groups: ['Basic', 'Symmetric'],
+        groups: ['Basic', 'Symmetric', 'Triads'],
         long: 'Vermindert',
         /* short: 'o' */
     },
     {
         symbol: 'M#5', // = Mb6
-        groups: ['Advanced', 'Symmetric'],
+        groups: ['Advanced', 'Symmetric', 'Triads'],
         short: '△#5'
     },
     {

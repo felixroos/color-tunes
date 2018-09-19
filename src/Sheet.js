@@ -1,13 +1,21 @@
 import React from 'react';
 import './sheet.css';
 import Chord from './Chord';
+import { sheetConfig } from './config';
+
+const cellStyle = {
+  flex: `0 0 ${100 / sheetConfig.columns}%`,
+  maxWidth: `${100 / sheetConfig.columns}%`
+}
 
 class Measure extends React.Component {
   render() {
     const chords = this.props.chords.map((chord, index) => (
+      /* highlight={this.props.highlight === index} */
       <Chord
-        highlight={this.props.highlight === index}
-        chord={chord}
+        highlight={this.props.active}
+        chord={this.props.idle ? !index ? sheetConfig.repeatedBar : ' ' : chord}
+        root={this.props.roots ? this.props.roots[index] : null}
         key={index}
         onClick={() => this.props.onClickChord(chord)}
         harmony={this.props.harmony ? this.props.harmony[index] : null}
@@ -15,7 +23,7 @@ class Measure extends React.Component {
     ));
     const signs = this.props.signs || [];
     // TODO: add section + house
-    let before = '', after = '', time = '', section = '', house = '', comments = '';
+    let before = '', after = '', time = '', section = '', house = '', comments = '', coda = '';
     if (signs.includes('{')) {
       before += ':';
     }
@@ -46,12 +54,19 @@ class Measure extends React.Component {
         {this.props.comments.join(' ')}
       </div>)
     }
-    const blockStart = ((this.props.index || 0) % 4 === 0);
+    if (this.props.coda) {
+      coda = (<div className="section coda">
+        coda
+      </div>);
+    }
+    const blockStart = ((this.props.index || 0) % sheetConfig.columns === 0);
     //${this.props.house /* && !this.props.index */ ? ' house' : ''}
-    return <div className={'cell' + (blockStart ? ' block-start' : '')}>
+    return <div style={cellStyle}
+      className={'cell' + (blockStart ? ' block-start' : '') + (this.props.idle ? ' idle' : '')}>
       <div className="cell-header">
         {section}
         {house}
+        {coda}
       </div>
       <div className="cell-body">
         {
@@ -70,9 +85,9 @@ class Measure extends React.Component {
           </div>
         </div>
       </div>
-      <div className="cell-footer">
+      {!this.props.hideFooter ? <div className="cell-footer">
         {comments}
-      </div>
+      </div> : ''}
     </div>
   }
 }
@@ -86,15 +101,18 @@ export default class Sheet extends React.Component {
   addSpacers(sheet) {
     return sheet.reduce((cells, m, index) => {
       let offset = 0;
+      const spacers = this.countSpacers(cells);
+      const indexWithSpacers = index + spacers;
 
       if (m.house > 1) {
         const first = sheet.slice(0, index).reverse().find(m => m.house === 1); // house 1 in sheet
         const cellIndex = cells.indexOf(cells.find(c => c.index === first.index)); // index of house 1 in cells
         const spacersTillFirst = this.countSpacers(cells.slice(0, cellIndex)); // spacers till house 1
-        offset = (first.index + spacersTillFirst) % 4;
-      } else if (m.section && index % 4 !== 0) {
-        const spacers = this.countSpacers(cells);
-        offset = 4 - ((index + spacers) % 4);
+        if (first) {
+          offset = (first.index + spacersTillFirst) % sheetConfig.columns;
+        }
+      } else if (m.section && indexWithSpacers % sheetConfig.columns !== 0) {
+        offset = sheetConfig.columns - (indexWithSpacers % sheetConfig.columns);
       }
       if (offset > 0) {
         cells = cells.concat(new Array(offset).fill({
@@ -123,23 +141,32 @@ export default class Sheet extends React.Component {
     let cells = sheet.map((m, index) => Object.assign(m, { index }));
     cells = this.fixRepeatedBars(cells);
     cells = this.addSpacers(cells);
+    /* cells = cells.map(cell => {
+      if (cell.chords) {
+        cell.chords = [].concat(cell.chords.map(chord => transposeChord(chord, this.props.transpose)));
+      }
+      return Object.assign({}, cell);
+    }); */
 
     const chords = cells
       .map((cell, index) => {
         if (cell.spacer) {
-          return (<div className="cell spacer" key={index}></div>);
+          return (<div style={cellStyle} className="cell spacer" key={index}></div>);
         }
         return (
           <Measure
+            idle={cell.idle}
             section={cell.section}
             house={cell.house}
+            coda={cell.coda}
             comments={cell.comments}
             time={cell.time}
             onClickChord={(chord) => this.props.onClickChord(chord)}
             key={index} index={index}
-            chords={cell.chords}
+            chords={cell.transposed || cell.chords}
             active={cell.index === this.props.highlight}
-            signs={cell.signs} />
+            signs={cell.signs}
+            roots={this.props.roots[cell.index]} />
         )
       });
     return <div className="sheet">

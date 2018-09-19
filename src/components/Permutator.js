@@ -37,11 +37,19 @@ export default class Permutator extends React.Component {
         if (step === 'd5') {
             step = 'b5';
         }
+        if (step === '8') {
+            step = '1';
+        }
+        if (step === '7') {
+            step = '△7';
+        }
         return step;
     }
 
     clickedStep(step, index) {
-        console.log('step', step, index);
+        if (this.props.onClickStep) {
+            this.props.onClickStep(step, this.props.notes[index], index);
+        }
     }
 
     getTonicIndex() {

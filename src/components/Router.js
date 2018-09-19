@@ -1,13 +1,13 @@
 import React from "react";
-import Songs from '../Songs'
+import Tunes from '../Tunes'
 import Explorer from '../Explorer'
 
 export default ({ route }) => {
 
     switch (route.path) {
-        case "songs":
-            return <Songs />;
-        default:
+        case "explorer":
             return <Explorer />;
+        default:
+            return <Tunes />;
     }
 };

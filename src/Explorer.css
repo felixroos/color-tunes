@@ -3,6 +3,14 @@ ul {
     /* border-top: 1px solid #ccc; */
 }
 
+.explorer {
+    height: calc(100% - 50px);
+    width: 100%;
+    position: absolute;
+    top: 50px;
+    display: flex;
+}
+
 .explorer li, .song li {
     list-style: none;
     display: inline-block;
@@ -21,6 +29,39 @@ ul {
 
 .action-buttons {
     float: right;
+}
+
+.aside {
+    box-sizing: border-box;
+    width: 30vw;
+    height: 100%;
+    overflow: hidden;
+    background: white;
+    padding: 10px;
+    background: #efefef;
+}
+
+.aside .circle {
+    height: 250px;
+    width: 100%;
+    border-radius: 100%;
+    text-align: center;
+}
+
+.aside .scroll-content {
+    overflow: auto;
+    height: calc(100% - 250px);
+}
+
+.explorer-content {
+    padding: 10px;
+    box-sizing: border-box;
+    width: 70vw;
+    margin-left: 30vw;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    overflow: auto;
 }
 
 .symbols {

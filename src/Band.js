@@ -14,7 +14,7 @@ import { defaultMethod, improvisationMethods } from 'jazzband/lib/improvisation/
 
 export default class Band extends React.Component {
 
-  grooves = { swing, bossa, funk, disco };
+  grooves = { bossa, swing, funk, disco };
 
   constructor() {
     super();

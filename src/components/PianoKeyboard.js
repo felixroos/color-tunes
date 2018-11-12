@@ -2,9 +2,7 @@
 import cat from "classcat";
 import React from 'react';
 import { Array, Note } from "tonal";
-import { circleIndex } from "./CircleSet";
 import { pitchColor } from './Colorizer';
-import { stepColor } from './Colorizer';
 import { colorConfig } from '../config';
 import "./PianoKeyboard.css";
 

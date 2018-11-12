@@ -2,9 +2,8 @@
 // ripped from https://github.com/danigb/tonal-app/blob/master/src/components/viz/CircleSet.js
 import React from 'react';
 import "./CircleSet.css";
-import { stepColor } from './Colorizer';
 import { Note } from 'tonal';
-import { pitchColor, pitchIndex } from '../components/Colorizer';
+import { pitchColor } from '../components/Colorizer';
 
 export function circleIndex(index, fourths, flip) {
     if (!fourths && !flip) {

@@ -1,6 +1,5 @@
 import React from 'react';
 import Sheet from './Sheet';
-import ColorTest from './tests/ColorTest';
 import { parentModes, transposeSong } from './chordScales';
 
 

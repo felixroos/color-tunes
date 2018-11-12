@@ -23,7 +23,7 @@ class Measure extends React.Component {
     ));
     const signs = this.props.signs || [];
     // TODO: add section + house
-    let before = '', after = '', time = '', section = '', house = '', comments = '', coda = '';
+    let before = '', after = '', time = '', section = '', house = '', /* comments = '',  */coda = '';
     if (signs.includes('{')) {
       before += ':';
     }
@@ -50,9 +50,9 @@ class Measure extends React.Component {
       </div>)
     }
     if (this.props.comments) {
-      comments = (<div className="comments">
+      /* comments = (<div className="comments">
         {this.props.comments.join(' ')}
-      </div>)
+      </div>) */
     }
     if (this.props.coda) {
       coda = (<div className="section coda">
@@ -85,9 +85,9 @@ class Measure extends React.Component {
           </div>
         </div>
       </div>
-      {!this.props.hideFooter ? <div className="cell-footer">
+      {/* !this.props.hideFooter ? <div className="cell-footer">
         {comments}
-      </div> : ''}
+      </div> : '' */}
     </div>
   }
 }

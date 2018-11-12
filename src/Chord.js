@@ -1,7 +1,7 @@
 import React from 'react';
 import { getTonalChord } from './chordScales';
 import { pitchColor } from './components/Colorizer';
-import { colorConfig, sheetConfig } from './config';
+import { colorConfig } from './config';
 
 function readableChord(chord) {
   if (!chord) {

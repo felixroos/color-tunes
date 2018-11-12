@@ -1,8 +1,8 @@
 {
-  "main.css": "static/css/main.088fe25a.css",
-  "main.css.map": "static/css/main.088fe25a.css.map",
-  "main.js": "static/js/main.61847667.js",
-  "main.js.map": "static/js/main.61847667.js.map",
+  "main.css": "static/css/main.20dfb143.css",
+  "main.css.map": "static/css/main.20dfb143.css.map",
+  "main.js": "static/js/main.03d4119d.js",
+  "main.js.map": "static/js/main.03d4119d.js.map",
   "static/media/A1.mp3": "static/media/A1.462866c2.mp3",
   "static/media/A2.mp3": "static/media/A2.4748142c.mp3",
   "static/media/A3.mp3": "static/media/A3.c254d5b2.mp3",
@@ -91,5 +91,6 @@
   "static/media/hihat.wav": "static/media/hihat.371e899d.wav",
   "static/media/kick.wav": "static/media/kick.bd64b0da.wav",
   "static/media/ride.wav": "static/media/ride.48a46915.wav",
+  "static/media/rimshot.wav": "static/media/rimshot.921eaed3.wav",
   "static/media/snare.wav": "static/media/snare.f987b25d.wav"
 }

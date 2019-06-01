@@ -125,9 +125,9 @@ export default class Sheet extends React.Component {
 
   fixRepeatedBars(sheet) {
     return sheet.map(m => {
-      m.chords = m.chords.map(c => c === 'r' ? 'x' : c);
+      m.chords = m.chords.map(c => c === 'r' ? '%' : c);
       if (!m.chords.length) {
-        m.chords = ['x']
+        m.chords = ['%']
       }
       return m
     })

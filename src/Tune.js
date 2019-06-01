@@ -21,12 +21,12 @@ export default class Tune extends React.Component {
     // returns all related ionian roots that include the given chord, travels back if x
     function findRoots(chord, index, chords) {
       // console.log('findRoots', index, chord);
-      if (chord !== 'x') {
+      if (chord !== '%') {
         return parentModes(chord, 'ionian');
       } else if (index !== 0) {
         return findRoots(chords[index - 1], index - 1, chords);
       } else {
-        console.warn('first chord cannot be a repeating chord (% / x)');
+        console.warn('first chord cannot be a repeating chord (%)');
         return [];
       }
     }

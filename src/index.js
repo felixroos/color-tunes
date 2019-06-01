@@ -7,6 +7,9 @@ import store from "./store";
 import App from "./App";
 // ========================================
 
+import 'tone';
+import '@webcomponents/webcomponentsjs';
+import '@tonejs/ui';
 
 
 initRouter(store);

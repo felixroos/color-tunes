@@ -24,11 +24,15 @@ export default class Band extends React.Component {
       samples: piano, midiOffset: 24, gain: 1, context,
       onTrigger: ({ on, off, active }) => this.updateActiveNotes(active)
     });
+
+    /* this.keyboard = new jazz.WebAudioFont({
+      context, preset: 6, gain: .7,
+      onTrigger: ({ on, off, active }) => this.updateActiveNotes(active)
+    }); */
+    /* this.bass = new jazz.WebAudioFont({ context, preset: 366, gain: .7 }); */
+
     this.drums = new jazz.Sampler({ samples: drumset, context, gain: 0.7, duration: 6000 });
 
-    this.drummer = new jazz.Drummer(this.drums);
-    this.pianist = new jazz.Pianist(this.keyboard);
-    this.bassist = new jazz.Bassist(this.keyboard);
     this.band = new jazz.Trio({
       solo: true,
       context, piano: this.keyboard, bass: this.keyboard, drums: this.drums,
@@ -36,12 +40,17 @@ export default class Band extends React.Component {
         this.props.onChangePosition(measure.index);
       }
     });
+    this.drummer = this.band.drummer;
+    this.pianist = this.band.pianist;
+    this.bassist = this.band.bassist;
+
     this.naturalInstruments();
     this.state = {
       circle: 'fourths', // fifths, chromatics
       arpeggiate: true,
       overlap: false,
       autoplay: true,
+      metronome: true,
       position: null,
       activeNotes: [],
       tempo: 130,
@@ -68,7 +77,7 @@ export default class Band extends React.Component {
     console.log('groove', this.state.groove);
     console.log('musicians', this.state.activeMusicians);
     this.band.comp(this.props.sheet, {
-      metronome: true,
+      metronome: this.state.metronome,
       bpm: this.state.tempo,
       groove: this.state.groove,
       musicians: this.state.activeMusicians,

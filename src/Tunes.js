@@ -26,7 +26,7 @@ export default class Tunes extends React.Component {
   select(song) { //ireal song
     const parsed = new RealParser(song.music.raw);
     const sheet = parsed.sheet;
-    console.log('tokens', parsed.tokens);
+    /* console.log('tokens', parsed.tokens); */
     console.log('sheet', sheet);
     song = Object.assign(song, { sheet, measures: parsed.measures });
     transposeSong(song, this.state.transposeInstrument);
